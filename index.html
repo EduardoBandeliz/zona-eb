@@ -71,6 +71,10 @@ background:linear-gradient(135deg,#eaf1ff,#eee9ff)}
 .cmeta svg{width:14px;height:14px;fill:none;stroke:var(--mut);stroke-width:2}
 .cstat{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;margin-top:7px}
 .sdot{width:11px;height:11px;border-radius:50%}.sdot.a{background:var(--azul)}.sdot.r{background:var(--rojo)}
+.tipo{display:none;align-items:center;gap:6px;font-size:12.5px;font-weight:800;padding:6px 11px;border-radius:999px;margin-top:10px}
+.tipo svg{width:15px;height:15px;fill:currentColor}
+.tipo.pj{background:#ecfdf5;color:#047857;border:1px solid #b7ebd6}
+.tipo.pp{background:#eef2ff;color:#4338ca;border:1px solid #cfd6ff}
 .tsel{display:flex;gap:8px;margin-top:10px}
 .tbtn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:8px 11px;border-radius:999px;
 cursor:pointer;border:1.5px solid #e3e9f1;background:#fff;color:#98a2b3;transition:all .12s}
@@ -138,10 +142,11 @@ z-index:2000;background:#eaf0f6;color:var(--eb);font-size:15px;font-weight:700}
    <div class='cname' id='cNombre'></div>
    <div class='cmeta'><svg viewBox='0 0 24 24'><path d='M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z'/><circle cx='12' cy='10' r='2.5'/></svg><span id='cDist'></span></div>
    <div class='cstat'><span class='sdot a' id='cDot'></span><span id='cEstado'></span></div>
-   <div class='tsel'>
+   <div class='tsel' id='tsel'>
     <button id='btPJ' class='tbtn'><svg viewBox='0 0 24 24'><path d='M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z'/></svg>Tienda PayJoy</button>
     <button id='btPP' class='tbtn'><svg viewBox='0 0 24 24'><rect x='6' y='2' width='12' height='20' rx='3'/><rect x='9' y='4' width='6' height='1.6' rx='.8' fill='#fff'/></svg>Tienda PayPhone</button>
    </div>
+   <div id='cTipo' class='tipo'></div>
   </div>
  </div>
  <div class='cact'>
@@ -167,6 +172,9 @@ function TP(p){return OVR[K(p)]||p.t;}           // tipo efectivo (marca manual 
 const _p=new URLSearchParams(location.search);
 const LOCK=(_p.get('v')||'').trim();
 const ZONA=LOCK?(VEND_ESTADOS[LOCK]||[]):null;
+// Embebido en EB Mobile (WebView nativo o iframe web) y con ?admin=1 => puede marcar.
+const EMBED=!!(window.ReactNativeWebView)||(window.parent&&window.parent!==window);
+const ADMIN=_p.get('admin')==='1'&&EMBED;
 const CAP=350;
 const ICON_PP="<svg viewBox='0 0 24 24'><rect x='6' y='2' width='12' height='20' rx='3'/><rect x='9' y='4' width='6' height='1.6' rx='.8' fill='#fff'/></svg>";
 const ICON_PJ="<svg viewBox='0 0 24 24'><path d='M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z'/></svg>";
@@ -230,9 +238,13 @@ function seleccionar(x){
  $('cDot').className='sdot '+(x.v?'r':'a');
  const dist=userLL?hav(userLL,[p.lat,p.lng]):null;
  $('cDist').textContent=dist!=null?(fmtDist(dist)+' · '+prox(dist)):((p.c?p.c+' · ':'')+p.e);
- pintarBotones(p);
- $('btPJ').onclick=function(){marcar(p,'payjoy');};
- $('btPP').onclick=function(){marcar(p,'payphone');};
+ if(ADMIN){$('tsel').style.display='flex';$('cTipo').style.display='none';
+  pintarBotones(p);
+  $('btPJ').onclick=function(){marcar(p,'payjoy');};
+  $('btPP').onclick=function(){marcar(p,'payphone');};
+ }else{$('tsel').style.display='none';var tt=TP(p);
+  $('cTipo').style.display='inline-flex';$('cTipo').className='tipo '+(tt==='payjoy'?'pj':'pp');
+  $('cTipo').innerHTML=(tt==='payjoy'?ICON_PJ:ICON_PP)+(tt==='payjoy'?'Tienda PayJoy':'Tienda PayPhone');}
  const q=p.lat+','+p.lng;
  $('cNav').href='https://www.google.com/maps/search/?api=1&query='+q;
  $('cCopy').onclick=function(){try{navigator.clipboard.writeText(q);}catch(e){}$('cCopy').textContent='✓';setTimeout(function(){$('cCopy').textContent='⧉';},1200);};
@@ -257,8 +269,10 @@ function pintarBotones(p){var t=TP(p);
  $('btPJ').className='tbtn'+(t==='payjoy'?' on pj':'');
  $('btPP').className='tbtn'+(t==='payphone'?' on pp':'');}
 function marcar(p,t){OVR[K(p)]=t;pintarBotones(p);pintar();if(listaOn)pintarLista();
- fetch(SB+'/rest/v1/mapa_tipo',{method:'POST',headers:HSAVE,body:JSON.stringify({k:K(p),tipo:t,updated_at:new Date().toISOString()})})
-  .then(function(r){if(!r.ok)r.text().then(function(t){console.warn('guardar tipo',r.status,t);});}).catch(function(){});}
+ // No escribimos con llave pública: le avisamos a EB Mobile y la app guarda con la sesión del admin (RLS).
+ var msg={type:'ebMarca',k:K(p),tipo:t};
+ try{if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify(msg));}
+  else if(window.parent&&window.parent!==window){window.parent.postMessage(msg,'*');}}catch(e){}}
 function cargarOVR(){fetch(SB+'/rest/v1/mapa_tipo?select=k,tipo',{headers:HREAD})
  .then(function(r){return r.json();}).then(function(rows){if(Array.isArray(rows)){
   rows.forEach(function(r){OVR[r.k]=r.tipo;});filtrar();}}).catch(function(){});}
