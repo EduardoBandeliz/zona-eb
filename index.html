@@ -234,7 +234,7 @@ function stats(){
 function seleccionar(x){
  selId=x.p.id;const p=x.p;
  $('cNombre').textContent=p.n;
- $('cEstado').textContent=x.v?('Visitado'+(x.quien?' · '+x.quien:'')):'Visita pendiente';
+ $('cEstado').textContent=x.v?('Última visita: '+(x.inf?x.inf.f:'—')+(x.quien?' · '+x.quien:'')):'No visitado';
  $('cDot').className='sdot '+(x.v?'r':'a');
  const dist=userLL?hav(userLL,[p.lat,p.lng]):null;
  $('cDist').textContent=dist!=null?(fmtDist(dist)+' · '+prox(dist)):((p.c?p.c+' · ':'')+p.e);
