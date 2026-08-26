@@ -155,7 +155,9 @@ if(LOCK){document.getElementById('fVend').style.display='none';
 const map=L.map('map',{preferCanvas:false,zoomControl:false}).setView([19.7,-101.9],7);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
  {maxZoom:19,maxNativeZoom:16,attribution:'© Esri',updateWhenIdle:true,keepBuffer:1}).addTo(map);
-const capa=L.layerGroup().addTo(map);
+const canvasR=L.canvas({padding:.3});
+const capa=L.layerGroup().addTo(map);       // pines (teardrop)
+const capaDots=L.layerGroup().addTo(map);   // puntitos canvas (pendientes en zoom lejano = rápido)
 let FILTRADOS=[], selId=null, userLL=null, capaYo=null, listaOn=false, primera=true;
 const $=function(id){return document.getElementById(id);};
 function hav(a,b){const R=6371000,t=Math.PI/180,dlat=(b[0]-a[0])*t,dlng=(b[1]-a[1])*t;
@@ -180,12 +182,19 @@ function filtrar(){
  stats();pintar();if(listaOn)pintarLista();
  if(primera&&FILTRADOS.length){primera=false;try{map.fitBounds(FILTRADOS.map(x=>[x.p.lat,x.p.lng]),{padding:[60,60],maxZoom:12});}catch(e){}}
 }
-function addM(x){const m=L.marker([x.p.lat,x.p.lng],{icon:pinIcon(x.v,selId===x.p.id),keyboard:false});
+function addPin(x){const m=L.marker([x.p.lat,x.p.lng],{icon:pinIcon(x.v,selId===x.p.id),keyboard:false});
  m.on('click',function(){seleccionar(x);});capa.addLayer(m);}
+function addDot(x){capaDots.addLayer(L.circleMarker([x.p.lat,x.p.lng],{renderer:canvasR,interactive:false,
+ radius:4,color:'#fff',weight:1,fillColor:x.v?'#E5322D':'#2E7DF6',fillOpacity:.9}));}
 function pintar(){
- capa.clearLayers();const b=map.getBounds();let n=0;
- for(const x of FILTRADOS){if(x.v&&b.contains([x.p.lat,x.p.lng]))addM(x);}
- for(const x of FILTRADOS){if(n>=CAP)break;if(!x.v&&b.contains([x.p.lat,x.p.lng])){addM(x);n++;}}
+ capa.clearLayers();capaDots.clearLayers();
+ const b=map.getBounds(),z=map.getZoom();let n=0;
+ for(const x of FILTRADOS){
+  if(!b.contains([x.p.lat,x.p.lng]))continue;
+  if(x.v||selId===x.p.id){addPin(x);continue;}   // visitados y el seleccionado: siempre pin
+  if(z>=10){if(n<CAP){addPin(x);n++;}}           // acercado: pines bonitos
+  else addDot(x);                                 // alejado: puntito canvas (rápido)
+ }
 }
 function stats(){
  $('sComp').textContent=FILTRADOS.filter(x=>x.v).length;
