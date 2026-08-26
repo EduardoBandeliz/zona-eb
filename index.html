@@ -18,6 +18,8 @@ border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0}
 .dot{width:11px;height:11px;border-radius:50%}.dot.r{background:var(--rojo)}.dot.a{background:var(--azul)}
 .act{font-size:11px;color:#64748b;margin-left:auto;white-space:nowrap}
 .pv{color:var(--rojo);font-weight:700}
+.gm{color:var(--eb);font-weight:600;text-decoration:none;display:inline-block;margin-top:3px}
+.leaflet-popup-content{font-size:13px;line-height:1.45}
 #cargando{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2000;
 background:#f8fafc;color:var(--eb);font-size:16px;font-weight:600}
 </style></head><body>
@@ -29,7 +31,7 @@ background:#f8fafc;color:var(--eb);font-size:16px;font-weight:600}
 <input id="fCiudad" placeholder="Buscar ciudad…" size="11">
 <span class="chip"><span class="dot r"></span>Visitados: <b id="cVis">0</b></span>
 <span class="chip"><span class="dot a"></span>Pendientes: <b id="cPen">0</b></span>
-<span class="act">Actualizado: 26/Aug 10:25 · se actualiza cada hora</span>
+<span class="act">Actualizado: 26/Aug 10:37 · se actualiza cada hora</span>
 </div>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -52,10 +54,15 @@ function dibujar(){
    weight:v?1.5:.5,fillColor:v?'#dc2626':'#2563eb',fillOpacity:v?.95:.55});
   let h='<b>'+p.n+'</b><br>'+(p.c||'')+' · <small>'+p.e+'</small>';
   if(inf)h+='<br><span class="pv">✓ Visitado</span> por '+inf.v+'<br><small>'+inf.f+' · a '+inf.d+' m'+(inf.c?' · '+inf.c:'')+'</small>';
+  const q=p.lat+','+p.lng;
+  h+='<br><a class="gm" href="https://www.google.com/maps/search/?api=1&query='+q+'" target="_blank" rel="noopener">📍 Abrir en Google Maps</a>'
+    +'<br><span class="gm" style="cursor:pointer" onclick="return cop(this,\''+q+'\')">⧉ Copiar ubicación</span>'
+    +'<br><small style="color:#94a3b8">'+q+'</small>';
   m.bindPopup(h); capa.addLayer(m);
  }
  cVis.textContent=vis; cPen.textContent=pen;
 }
+function cop(el,t){try{navigator.clipboard.writeText(t);}catch(e){}el.textContent='✓ Copiado';setTimeout(function(){el.textContent='⧉ Copiar ubicación';},1500);return false;}
 fEstado.onchange=dibujar; fVend.onchange=dibujar; fCiudad.oninput=dibujar;
 dibujar(); cargando.style.display='none';
 </script></body></html>
