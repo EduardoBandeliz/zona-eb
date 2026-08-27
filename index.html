@@ -285,7 +285,7 @@ function registrarVisita(p){
   else if(window.parent&&window.parent!==window){window.parent.postMessage(msg,'*');}}catch(e){}
  var bt=$('cVisita');bt.disabled=true;bt.innerHTML='Registrando…';bt._pid=p.id;
  clearTimeout(_visitaTO);
- _visitaTO=setTimeout(function(){bt.disabled=false;bt.innerHTML='Reintentar (actualiza la app)';},7000);
+ _visitaTO=setTimeout(function(){bt.innerHTML='Enviado ✓ (si no se pinta, actualiza la app)';},7000);
 }
 // La app confirma el guardado con esto (native: injectJavaScript; web: postMessage 'ebVisitaResult').
 function ebVisitaResult(ok,detalle){
