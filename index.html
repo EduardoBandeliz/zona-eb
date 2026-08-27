@@ -168,7 +168,7 @@ z-index:2000;background:#eaf0f6;color:var(--eb);font-size:15px;font-weight:700}
  </div>
  <div id='visitaBox'>
   <textarea id='cNota' placeholder='Nota de la visita (opcional)…' rows='2'></textarea>
-  <button id='cVisita'><svg viewBox='0 0 24 24'><path d='M20 6L9 17l-5-5'/></svg>Registrar visita aquí</button>
+  <button id='cVisita'><svg viewBox='0 0 24 24'><path d='M20 6L9 17l-5-5'/></svg>Registrar visita (foto, SIMs)</button>
  </div>
 </div>
 <a id='rutaGo' target='_blank' rel='noopener'></a>
@@ -273,19 +273,20 @@ function seleccionar(x){
  $('cCopy').onclick=function(){try{navigator.clipboard.writeText(q);}catch(e){}$('cCopy').textContent='✓';setTimeout(function(){$('cCopy').textContent='⧉';},1200);};
  // Registrar visita desde el mapa (solo dentro de EB Mobile). Ahorra el paso de "registrar visita".
  if(EMBED){$('visitaBox').style.display='block';$('cNota').value='';
-  var bt=$('cVisita');bt.disabled=false;bt.innerHTML="<svg viewBox='0 0 24 24'><path d='M20 6L9 17l-5-5'/></svg>Registrar visita aquí";
+  var bt=$('cVisita');bt.disabled=false;bt.innerHTML="<svg viewBox='0 0 24 24'><path d='M20 6L9 17l-5-5'/></svg>Registrar visita (foto, SIMs)";
   bt.onclick=function(){registrarVisita(p);};
  }else{$('visitaBox').style.display='none';}
  $('card').style.display='block';
  map.panTo([p.lat,p.lng]);pintar();
 }
 function registrarVisita(p){
- var msg={type:'ebVisita',id:p.id,lat:p.lat,lng:p.lng,nombre:p.n,nota:($('cNota').value||'').trim()};
+ // Abre el formulario completo de visita (SIMs, foto, tipo) prellenado con este punto.
+ var msg={type:'ebAbrirVisita',id:p.id,lat:p.lat,lng:p.lng,nombre:p.n,nota:($('cNota').value||'').trim()};
  try{if(window.ReactNativeWebView){window.ReactNativeWebView.postMessage(JSON.stringify(msg));}
   else if(window.parent&&window.parent!==window){window.parent.postMessage(msg,'*');}}catch(e){}
- var bt=$('cVisita');bt.disabled=true;bt.innerHTML='Registrando…';bt._pid=p.id;
- clearTimeout(_visitaTO);
- _visitaTO=setTimeout(function(){bt.innerHTML='Enviado ✓ (si no se pinta, actualiza la app)';},7000);
+ VIS_LOCAL.add(p.id);  // se pinta rojo al instante; la visita completa se guarda en el formulario
+ var bt=$('cVisita');bt.innerHTML='Abriendo formulario…';
+ setTimeout(function(){filtrar();},400);
 }
 // La app confirma el guardado con esto (native: injectJavaScript; web: postMessage 'ebVisitaResult').
 function ebVisitaResult(ok,detalle){
