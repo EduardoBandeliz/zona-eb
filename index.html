@@ -323,7 +323,7 @@ function ebVisitaResult(ok,detalle){
  }
 }
 window.ebVisitaResult=ebVisitaResult;
-window.addEventListener('message',function(e){var m=e.data;if(m&&m.type==='ebVisitaResult')ebVisitaResult(!!m.ok,m.detalle||'');});
+window.addEventListener('message',function(e){var m=e.data;if(!m)return;if(m.type==='ebVisitaResult')ebVisitaResult(!!m.ok,m.detalle||'');else if(m.type==='ebVisitas'&&m.visitas)window.ebSetVisitas(m.visitas);});
 function pintarLista(){
  const L2=$('lista');const arr=FILTRADOS.slice(0,400);
  L2.innerHTML=arr.map(function(x,i){return "<div class='litem' data-i='"+i+"'><div class='lic "+(x.v?'v':'')+"'>"+iconoDe(TP(x.p))+"</div>"
