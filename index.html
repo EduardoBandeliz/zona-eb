@@ -215,6 +215,27 @@ function hav(a,b){const R=6371000,t=Math.PI/180,dlat=(b[0]-a[0])*t,dlng=(b[1]-a[
 function fmtDist(m){return m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';}
 function pinIcon(v,sel,t){return L.divIcon({className:'',iconSize:[34,40],iconAnchor:[17,38],
  html:"<div class='pin "+(v?'v':'p')+(sel?' sel':'')+"'>"+(sel?"<span class='ripple'></span>":"")+"<span class='head'>"+iconoDe(t)+"</span></div>"});}
+// Visitas en VIVO: la app (con la sesión del usuario) inyecta las visitas reales
+// y aquí se pintan de rojo al instante, sin esperar el rebuild del servidor.
+var VIS_LIVE=new Set();
+var GRID={};
+(function(){for(var i=0;i<PUNTOS.length;i++){var p=PUNTOS[i];var k=Math.round(p.lat/0.02)+','+Math.round(p.lng/0.02);(GRID[k]||(GRID[k]=[])).push(p);}})();
+window.ebSetVisitas=function(arr){
+ try{
+  if(!arr||!arr.length)return;
+  var cambio=false;
+  for(var j=0;j<arr.length;j++){
+   var la=+arr[j].lat,ln=+arr[j].lng;if(!isFinite(la)||!isFinite(ln))continue;
+   var c0=Math.round(la/0.02),c1=Math.round(ln/0.02),best=null,dmin=150;
+   for(var dj=-1;dj<=1;dj++)for(var dk=-1;dk<=1;dk++){
+    var cell=GRID[(c0+dj)+','+(c1+dk)];if(!cell)continue;
+    for(var m=0;m<cell.length;m++){var d=hav([la,ln],[cell[m].lat,cell[m].lng]);if(d<dmin){dmin=d;best=cell[m];}}
+   }
+   if(best&&!VIS_LIVE.has(best.id)){VIS_LIVE.add(best.id);cambio=true;}
+  }
+  if(cambio&&typeof filtrar==='function')filtrar();
+ }catch(e){}
+};
 function filtrar(){
  const q=($('q').value||'').trim().toLowerCase(),fe=$('fEstado').value,fv=$('fVend').value;
  FILTRADOS=[];
@@ -227,7 +248,7 @@ function filtrar(){
   else if(fv){if(por&&por[fv]){inf=por[fv];quien=fv;}}
   else if(por){for(const k in por){if(!inf||por[k].f>inf.f){inf=por[k];quien=k;}}}
   if(!LOCK&&fv&&!inf)continue;
-  var vloc=VIS_LOCAL.has(p.id);
+  var vloc=VIS_LOCAL.has(p.id)||VIS_LIVE.has(p.id);
   if(vloc&&!inf){inf={f:'hoy',d:0,c:''};quien=quien||'tú';}
   FILTRADOS.push({p:p,inf:inf,quien:quien,v:(!!inf)||vloc});
  }
