@@ -46,6 +46,9 @@ width:11px;height:11px;background:#fff;border-right:2px solid var(--azul);border
 .pin .head svg{width:17px;height:17px;fill:var(--azul)}
 .pin .ripple{position:absolute;bottom:-7px;left:50%;width:34px;height:13px;transform:translateX(-50%);border-radius:50%;
 background:radial-gradient(closest-side,rgba(46,125,246,.5),transparent)}
+.pin.nuevo .head{border-color:#12A26A;box-shadow:0 4px 8px rgba(18,162,106,.35)}
+.pin.nuevo .head:after{border-color:#12A26A}
+.pin.nuevo .head svg{fill:#12A26A}
 .pin.v .head{border-color:var(--rojo);box-shadow:0 4px 8px rgba(229,50,45,.35)}
 .pin.v .head:after{border-color:var(--rojo)}
 .pin.v .head svg{fill:var(--rojo)}
@@ -77,6 +80,7 @@ background:linear-gradient(135deg,#eaf1ff,#eee9ff)}
 .tipo svg{width:15px;height:15px;fill:currentColor}
 .tipo.pj{background:#ecfdf5;color:#047857;border:1px solid #b7ebd6}
 .tipo.pp{background:#eef2ff;color:#4338ca;border:1px solid #cfd6ff}
+.tipo.nv{background:#eafaf0;color:#0e7a4f;border:1px solid #b7ebc9}
 .tsel{display:flex;gap:8px;margin-top:10px}
 .tbtn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;padding:8px 11px;border-radius:999px;
 cursor:pointer;border:1.5px solid #e3e9f1;background:#fff;color:#98a2b3;transition:all .12s}
@@ -213,8 +217,8 @@ const $=function(id){return document.getElementById(id);};
 function hav(a,b){const R=6371000,t=Math.PI/180,dlat=(b[0]-a[0])*t,dlng=(b[1]-a[1])*t;
  const x=Math.sin(dlat/2)**2+Math.cos(a[0]*t)*Math.cos(b[0]*t)*Math.sin(dlng/2)**2;return 2*R*Math.asin(Math.min(1,Math.sqrt(x)));}
 function fmtDist(m){return m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';}
-function pinIcon(v,sel,t){return L.divIcon({className:'',iconSize:[34,40],iconAnchor:[17,38],
- html:"<div class='pin "+(v?'v':'p')+(sel?' sel':'')+"'>"+(sel?"<span class='ripple'></span>":"")+"<span class='head'>"+iconoDe(t)+"</span></div>"});}
+function pinIcon(v,sel,t,nuevo){return L.divIcon({className:'',iconSize:[34,40],iconAnchor:[17,38],
+ html:"<div class='pin "+(v?'v':'p')+(nuevo?' nuevo':'')+(sel?' sel':'')+"'>"+(sel?"<span class='ripple'></span>":"")+"<span class='head'>"+iconoDe(t)+"</span></div>"});}
 // Visitas en VIVO: la app (con la sesión del usuario) inyecta las visitas reales
 // y aquí se pintan de rojo al instante, sin esperar el rebuild del servidor.
 var VIS_LIVE=new Set();
@@ -255,7 +259,7 @@ function filtrar(){
  stats();pintar();if(listaOn)pintarLista();
  if(primera&&FILTRADOS.length){primera=false;try{map.fitBounds(FILTRADOS.map(x=>[x.p.lat,x.p.lng]),{padding:[60,60],maxZoom:12});}catch(e){}}
 }
-function addPin(x){const m=L.marker([x.p.lat,x.p.lng],{icon:pinIcon(x.v,selId===x.p.id,TP(x.p)),keyboard:false});
+function addPin(x){const m=L.marker([x.p.lat,x.p.lng],{icon:pinIcon(x.v,selId===x.p.id,TP(x.p),x.p.nuevo),keyboard:false});
  m.on('click',function(){seleccionar(x);});capa.addLayer(m);}
 function addDot(x){capaDots.addLayer(L.circleMarker([x.p.lat,x.p.lng],{renderer:canvasR,interactive:false,
  radius:4,color:'#fff',weight:1,fillColor:x.v?'#E5322D':'#2E7DF6',fillOpacity:.9}));}
@@ -286,9 +290,10 @@ function seleccionar(x){
   pintarBotones(p);
   $('btPJ').onclick=function(){marcar(p,'payjoy');};
   $('btPP').onclick=function(){marcar(p,'payphone');};
- }else{$('tsel').style.display='none';var tt=TP(p);
-  $('cTipo').style.display='inline-flex';$('cTipo').className='tipo '+(tt==='payjoy'?'pj':'pp');
-  $('cTipo').innerHTML=(tt==='payjoy'?ICON_PJ:ICON_PP)+(tt==='payjoy'?'Tienda PayJoy':'Tienda PayPhone');}
+ }else{$('tsel').style.display='none';var tt=TP(p);$('cTipo').style.display='inline-flex';
+  if(p.nuevo){$('cTipo').className='tipo nv';$('cTipo').innerHTML=ICON_PP+'Punto nuevo';}
+  else{$('cTipo').className='tipo '+(tt==='payjoy'?'pj':'pp');
+   $('cTipo').innerHTML=(tt==='payjoy'?ICON_PJ:ICON_PP)+(tt==='payjoy'?'Tienda PayJoy':'Tienda PayPhone');}}
  const q=p.lat+','+p.lng;
  $('cNav').href='https://www.google.com/maps/search/?api=1&query='+q;
  $('cCopy').onclick=function(){try{navigator.clipboard.writeText(q);}catch(e){}$('cCopy').textContent='✓';setTimeout(function(){$('cCopy').textContent='⧉';},1200);};
