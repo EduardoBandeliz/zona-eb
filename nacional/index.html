@@ -154,9 +154,10 @@ selEstado.onchange = () => {
 inpBusca.oninput = () => programarPintado();
 chkPayjoy.onchange = () => pintar();
 
-fetch('nacional.json').then(r=>r.json()).then(d => {
-  DATA = d;
-  const estados = [...new Set(d.map(p=>p.e))].sort((a,b)=>a.localeCompare(b,'es'));
+fetch('chunks/manifest.json').then(r=>r.json()).then(async man => {
+  const partes = await Promise.all(man.archivos.map(fn => fetch('chunks/'+fn).then(r=>r.json())));
+  DATA = partes.flat();
+  const estados = [...new Set(DATA.map(p=>p.e))].sort((a,b)=>a.localeCompare(b,'es'));
   for (const e of estados) {
     const o = document.createElement('option'); o.value=e; o.textContent=e; selEstado.appendChild(o);
   }
