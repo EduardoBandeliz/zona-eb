@@ -23,6 +23,8 @@
     font-size:14px; color:var(--marino); background:#fff;
   }
   .toggle { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--marino); font-weight:700; white-space:nowrap; }
+  .btnubi { flex:0 0 auto; padding:9px 12px; border:1px solid var(--azul); border-radius:10px; background:#EAF4FB;
+    color:var(--azul); font-weight:800; font-size:13px; cursor:pointer; white-space:nowrap; }
   .conteo { margin-top:8px; font-size:12.5px; color:#51607A; font-weight:600; }
   .conteo b { color:var(--azul); }
   .leyenda { position:absolute; z-index:1000; bottom:16px; left:10px; background:rgba(255,255,255,0.95);
@@ -43,10 +45,15 @@
   <div class="marca"><b>EB</b><i> Mobile</i> · Mapa Nacional de Prospectos</div>
   <div class="row">
     <select id="estado"><option value="">Todos los estados</option></select>
+    <select id="ciudad"><option value="">Todas las ciudades</option></select>
+  </div>
+  <div class="row">
+    <select id="tipo"><option value="">Todos los giros</option></select>
     <label class="toggle"><input type="checkbox" id="soloPayjoy" /> Solo PayJoy</label>
   </div>
   <div class="row">
     <input id="busca" placeholder="Buscar negocio o ciudad…" />
+    <button id="btnUbi" class="btnubi" title="Mi ubicación">📍 Cerca de mí</button>
   </div>
   <div class="conteo" id="conteo">Cargando…</div>
 </div>
@@ -67,24 +74,33 @@ const capa = L.layerGroup().addTo(map);
 
 let DATA = [];
 const selEstado = document.getElementById('estado');
+const selCiudad = document.getElementById('ciudad');
+const selTipo = document.getElementById('tipo');
 const inpBusca = document.getElementById('busca');
 const chkPayjoy = document.getElementById('soloPayjoy');
 const elConteo = document.getElementById('conteo');
+let yoMarker = null;
 
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const waLink = tel => { const d=(tel||'').replace(/\D/g,''); if(!d) return ''; const n=d.length===10?('52'+d):d; return 'https://wa.me/'+n; };
 
+function pasa(p) {
+  const e = selEstado.value, ci = selCiudad.value, ti = selTipo.value;
+  const q = inpBusca.value.trim().toLowerCase(), pj = chkPayjoy.checked;
+  if (e && p.e !== e) return false;
+  if (ci && p.c !== ci) return false;
+  if (ti && p.t !== ti) return false;
+  if (pj && !p.cr) return false;
+  if (q && !((p.n||'').toLowerCase().includes(q) || (p.c||'').toLowerCase().includes(q))) return false;
+  return true;
+}
+
 function filtrados() {
-  const e = selEstado.value;
-  const q = inpBusca.value.trim().toLowerCase();
-  const pj = chkPayjoy.checked;
   const b = map.getBounds();
   const res = [];
   for (let i=0;i<DATA.length;i++) {
     const p = DATA[i];
-    if (e && p.e !== e) continue;
-    if (pj && !p.cr) continue;
-    if (q && !((p.n||'').toLowerCase().includes(q) || (p.c||'').toLowerCase().includes(q))) continue;
+    if (!pasa(p)) continue;
     if (!b.contains([p.la, p.ln])) continue;
     res.push(p);
     if (res.length > 6000) break; // tope para fluidez
@@ -93,15 +109,20 @@ function filtrados() {
 }
 
 function totalFiltrado() {
-  const e = selEstado.value, q = inpBusca.value.trim().toLowerCase(), pj = chkPayjoy.checked;
   let n=0;
-  for (const p of DATA) {
-    if (e && p.e !== e) continue;
-    if (pj && !p.cr) continue;
-    if (q && !((p.n||'').toLowerCase().includes(q) || (p.c||'').toLowerCase().includes(q))) continue;
-    n++;
-  }
+  for (const p of DATA) if (pasa(p)) n++;
   return n;
+}
+
+// Llena el selector de ciudades según el estado elegido.
+function llenarCiudades() {
+  const e = selEstado.value;
+  const prev = selCiudad.value;
+  selCiudad.innerHTML = '<option value="">Todas las ciudades</option>';
+  if (!e) return;
+  const cities = [...new Set(DATA.filter(p=>p.e===e).map(p=>p.c).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+  for (const c of cities) { const o=document.createElement('option'); o.value=c; o.textContent=c; selCiudad.appendChild(o); }
+  if (cities.includes(prev)) selCiudad.value = prev;
 }
 
 let pintarPendiente=false;
@@ -144,6 +165,7 @@ function programarPintado() {
 
 map.on('moveend zoomend', programarPintado);
 selEstado.onchange = () => {
+  llenarCiudades();
   const e = selEstado.value;
   if (e) { // centra en el estado elegido
     const pts = DATA.filter(p=>p.e===e).map(p=>[p.la,p.ln]);
@@ -151,8 +173,27 @@ selEstado.onchange = () => {
   }
   pintar();
 };
+selCiudad.onchange = () => {
+  const ci = selCiudad.value;
+  if (ci) {
+    const pts = DATA.filter(p=>p.c===ci && (!selEstado.value||p.e===selEstado.value)).map(p=>[p.la,p.ln]);
+    if (pts.length) map.fitBounds(pts, { padding:[40,40], maxZoom:13 });
+  }
+  pintar();
+};
+selTipo.onchange = () => pintar();
 inpBusca.oninput = () => programarPintado();
 chkPayjoy.onchange = () => pintar();
+
+document.getElementById('btnUbi').onclick = () => {
+  if (!navigator.geolocation) { alert('Tu dispositivo no permite ubicación.'); return; }
+  navigator.geolocation.getCurrentPosition((pos) => {
+    const ll = [pos.coords.latitude, pos.coords.longitude];
+    if (yoMarker) map.removeLayer(yoMarker);
+    yoMarker = L.circleMarker(ll, { renderer:canvas, radius:8, color:'#fff', weight:2, fillColor:'#E4002B', fillOpacity:1 }).addTo(map);
+    map.setView(ll, 13);
+  }, () => alert('No pude obtener tu ubicación. Revisa el permiso.'), { enableHighAccuracy:true, timeout:8000 });
+};
 
 fetch('chunks/manifest.json').then(r=>r.json()).then(async man => {
   const partes = await Promise.all(man.archivos.map(fn => fetch('chunks/'+fn).then(r=>r.json())));
@@ -161,6 +202,12 @@ fetch('chunks/manifest.json').then(r=>r.json()).then(async man => {
   for (const e of estados) {
     const o = document.createElement('option'); o.value=e; o.textContent=e; selEstado.appendChild(o);
   }
+  // Giros (tipos de negocio) más comunes primero.
+  const tc = {};
+  for (const p of DATA) { const t=(p.t||'').trim(); if (t) tc[t]=(tc[t]||0)+1; }
+  Object.keys(tc).sort((a,b)=>tc[b]-tc[a]).forEach(t => {
+    const o=document.createElement('option'); o.value=t; o.textContent=`${t} (${tc[t]})`; selTipo.appendChild(o);
+  });
   document.getElementById('cargando').style.display='none';
   map.invalidateSize();
   setTimeout(() => { map.invalidateSize(); pintar(); }, 250);
