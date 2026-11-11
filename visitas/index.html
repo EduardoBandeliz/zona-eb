@@ -1,0 +1,133 @@
+<!doctype html><html lang='es'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover'>
+<meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate'>
+<title>EB Mobile — Resumen de visitas</title>
+<style>
+:root{--eb:#2E7DF6;--eb2:#6D5DF6;--verde:#12A26A;--naranja:#F5821F;--rojo:#E5322D;--ink:#0B1B3B;--mut:#7A879C;--linea:#e8edf3;--bg:#eef3fb}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:16px;max-width:1100px;margin:0 auto}
+h1{font-size:20px;display:flex;align-items:center;gap:9px}
+h1 .ico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2E7DF6,#6D5DF6);display:flex;align-items:center;justify-content:center;font-size:18px}
+.sub{color:var(--mut);font-size:13px;margin:3px 0 16px 0}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(11,27,59,.07);border:1px solid #fff}
+.kpi b{font-size:24px;font-weight:800;display:block}
+.kpi small{color:var(--mut);font-size:12px;font-weight:700}
+.kpi.azul b{color:var(--eb)}.kpi.verde b{color:var(--verde)}.kpi.nar b{color:var(--naranja)}.kpi.mor b{color:var(--eb2)}
+.filtros{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.filtros input,.filtros select{font-size:14px;padding:10px 12px;border:1px solid #dbe3ee;border-radius:11px;background:#fff;color:var(--ink);outline:none}
+.filtros input:focus,.filtros select:focus{border-color:var(--eb)}
+.btn{background:linear-gradient(135deg,#12A26A,#1BB97C);color:#fff;border:0;border-radius:11px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn.g{background:#f1f4f9;color:#334155}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(11,27,59,.07)}
+.card h2{font-size:14px;margin-bottom:12px;color:var(--ink)}
+.bar{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bar .lbl{width:92px;font-size:12px;color:var(--mut);font-weight:700;text-align:right;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .track{flex:1;height:18px;background:#eef2f7;border-radius:6px;overflow:hidden}
+.bar .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#2E7DF6,#6D5DF6)}
+.bar .val{font-size:12px;font-weight:800;color:var(--ink);width:34px;text-align:right}
+.bar.v .fill{background:linear-gradient(90deg,#12A26A,#1BB97C)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--linea)}
+th{color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;background:#fff}
+td a{color:var(--eb);text-decoration:none;font-weight:700}
+.tabla-wrap{background:#fff;border-radius:16px;padding:8px 14px 14px;box-shadow:0 8px 24px rgba(11,27,59,.07);max-height:60vh;overflow:auto}
+.vacio{color:var(--mut);text-align:center;padding:30px}
+.cargando{text-align:center;padding:50px;color:var(--eb);font-weight:700}
+@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.hide-m{display:none}}
+</style></head><body>
+<h1><span class='ico'>📋</span> Resumen de visitas</h1>
+<div class='sub' id='sub'>Cargando…</div>
+
+<div class='kpis'>
+ <div class='kpi azul'><b id='kTotal'>—</b><small>Total visitas</small></div>
+ <div class='kpi verde'><b id='kHoy'>—</b><small>Hoy</small></div>
+ <div class='kpi nar'><b id='kSem'>—</b><small>Últimos 7 días</small></div>
+ <div class='kpi mor'><b id='kVend'>—</b><small>Vendedores activos</small></div>
+</div>
+
+<div class='filtros'>
+ <input type='date' id='fDesde' title='Desde'>
+ <input type='date' id='fHasta' title='Hasta'>
+ <select id='fVend'><option value=''>Todos los vendedores</option></select>
+ <input id='fBusca' placeholder='Buscar cliente o municipio…' style='flex:1;min-width:150px'>
+ <button class='btn' id='btnXls'>⬇️ Descargar Excel</button>
+</div>
+
+<div class='grid2'>
+ <div class='card'><h2>Visitas por día (últimos 21 días)</h2><div id='porDia'></div></div>
+ <div class='card'><h2>Por vendedor</h2><div id='porVend'></div></div>
+</div>
+
+<div class='tabla-wrap'>
+ <table><thead><tr><th>Fecha</th><th>Hora</th><th>Vendedor</th><th>Cliente</th><th>Municipio</th><th class='hide-m'>Estado</th><th>Mapa</th></tr></thead>
+ <tbody id='tbody'><tr><td colspan='7' class='cargando'>Cargando visitas…</td></tr></tbody></table>
+</div>
+
+<script>
+let DATA=[];
+const $=id=>document.getElementById(id);
+const hoyISO=new Date().toISOString().slice(0,10);
+function diasAtras(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10);}
+
+function filtradas(){
+ const d=$('fDesde').value,h=$('fHasta').value,v=$('fVend').value,q=($('fBusca').value||'').trim().toLowerCase();
+ return DATA.filter(r=>{
+  if(d && r.fecha<d) return false;
+  if(h && r.fecha>h) return false;
+  if(v && r.vendedor!==v) return false;
+  if(q && !((r.cliente||'').toLowerCase().includes(q)||(r.municipio||'').toLowerCase().includes(q))) return false;
+  return true;
+ });
+}
+function pintar(){
+ const f=filtradas();
+ // KPIs (sobre TODO el set, no el filtro, salvo total filtrado)
+ $('kTotal').textContent=f.length.toLocaleString('es-MX');
+ $('kHoy').textContent=DATA.filter(r=>r.fecha===hoyISO).length.toLocaleString('es-MX');
+ const d7=diasAtras(6);
+ $('kSem').textContent=DATA.filter(r=>r.fecha>=d7).length.toLocaleString('es-MX');
+ $('kVend').textContent=new Set(DATA.filter(r=>r.fecha>=d7&&r.vendedor).map(r=>r.vendedor)).size;
+ // por día (21)
+ const dias=[];for(let i=20;i>=0;i--)dias.push(diasAtras(i));
+ const cd={};f.forEach(r=>{cd[r.fecha]=(cd[r.fecha]||0)+1;});
+ const maxd=Math.max(1,...dias.map(x=>cd[x]||0));
+ $('porDia').innerHTML=dias.map(x=>{const n=cd[x]||0;const et=x.slice(8)+'/'+x.slice(5,7);
+  return `<div class='bar v'><div class='lbl'>${et}</div><div class='track'><div class='fill' style='width:${Math.round((n/maxd)*100)}%'></div></div><div class='val'>${n}</div></div>`;}).join('');
+ // por vendedor
+ const cv={};f.forEach(r=>{const k=r.vendedor||'(sin nombre)';cv[k]=(cv[k]||0)+1;});
+ const arr=Object.entries(cv).sort((a,b)=>b[1]-a[1]);
+ const maxv=Math.max(1,...arr.map(x=>x[1]));
+ $('porVend').innerHTML=arr.length?arr.map(([k,n])=>
+  `<div class='bar'><div class='lbl'>${k}</div><div class='track'><div class='fill' style='width:${Math.round((n/maxv)*100)}%'></div></div><div class='val'>${n}</div></div>`).join(''):"<div class='vacio'>Sin datos</div>";
+ // tabla
+ const tb=$('tbody');
+ tb.innerHTML=f.length?f.slice(0,1000).map(r=>{
+  const q=(r.lat!=null&&r.lng!=null)?`<a href='https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}' target='_blank'>ver</a>`:'';
+  return `<tr><td>${r.fecha||''}</td><td>${r.hora||''}</td><td>${r.vendedor||''}</td><td>${r.cliente||''}</td><td>${r.municipio||''}</td><td class='hide-m'>${r.estado||''}</td><td>${q}</td></tr>`;
+ }).join(''):"<tr><td colspan='7' class='vacio'>No hay visitas con este filtro.</td></tr>";
+}
+function descargar(){
+ const f=filtradas();
+ let csv='﻿'+['Fecha','Hora','Vendedor','Cliente','Municipio','Estado','Lat','Lng','Nota'].join(',')+'\n';
+ const esc=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+ f.forEach(r=>{csv+=[r.fecha,r.hora,r.vendedor,r.cliente,r.municipio,r.estado,r.lat,r.lng,r.nota].map(esc).join(',')+'\n';});
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='visitas_EB_'+hoyISO+'.csv';a.click();
+}
+['fDesde','fHasta','fVend','fBusca'].forEach(id=>$(id).addEventListener('input',pintar));
+$('btnXls').onclick=descargar;
+
+fetch('visitas.json?_='+Date.now()).then(r=>r.json()).then(d=>{
+ DATA=d||[];
+ const fechas=DATA.map(r=>r.fecha).filter(Boolean).sort();
+ const vends=[...new Set(DATA.map(r=>r.vendedor).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+ vends.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;$('fVend').appendChild(o);});
+ $('fDesde').value=fechas.length?fechas[0]:'';
+ $('fHasta').value=hoyISO;
+ $('sub').textContent=`${DATA.length.toLocaleString('es-MX')} visitas · actualizado cada hora · ${fechas.length?('desde '+fechas[0]):''}`;
+ pintar();
+}).catch(e=>{$('sub').textContent='No pude cargar los datos.';$('tbody').innerHTML="<tr><td colspan='7' class='vacio'>Error al cargar visitas.json</td></tr>";});
+</script></body></html>
