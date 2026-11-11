@@ -1,5 +1,8 @@
 <!doctype html><html lang='es'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover'>
+<meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate'>
+<meta http-equiv='Pragma' content='no-cache'>
+<meta http-equiv='Expires' content='0'>
 <title>EB Mobile — Mapa Nacional de Prospectos</title>
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'>
 <style>
@@ -84,6 +87,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .spin{width:34px;height:34px;border:3px solid #cfe0f5;border-top-color:var(--eb);border-radius:50%;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .leaflet-control-zoom{display:none}
+.pin.nuevo .head{border-color:#F5821F;box-shadow:0 4px 8px rgba(245,130,31,.4)}
+.pin.nuevo .head:after{border-color:#F5821F}
+.pin.nuevo .head svg{fill:#F5821F}
+.pin.nuevo .ripple{background:radial-gradient(closest-side,rgba(245,130,31,.5),transparent)}
+#fab{position:absolute;z-index:1185;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));height:52px;border-radius:26px;background:linear-gradient(135deg,#F5821F,#FF9F45);color:#fff;border:0;font-weight:800;font-size:15px;padding:0 20px;box-shadow:0 10px 26px rgba(245,130,31,.45);display:flex;align-items:center;gap:8px;cursor:pointer}
+#tapbanner{position:absolute;z-index:1600;top:calc(80px + env(safe-area-inset-top));left:14px;right:14px;background:#0B1B3B;color:#fff;border-radius:14px;padding:13px 16px;font-size:14px;font-weight:700;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3);display:none}
+#toast{position:absolute;z-index:4000;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0B1B3B;color:#fff;padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:none}
+#modal{position:absolute;inset:0;z-index:3000;background:rgba(11,27,59,.45);display:none;align-items:flex-end;justify-content:center}
+#modal.show{display:flex}
+.sheet{background:#fff;width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25);max-height:94%;overflow-y:auto}
+.sheet h2{font-size:19px;margin-bottom:3px;color:#0B1B3B}
+.sheet p.sub{color:#7A879C;font-size:13px;margin-bottom:15px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:700;color:#0B1B3B;margin-bottom:6px}
+.field input{width:100%;font-size:15px;padding:12px 13px;border:1px solid #e1e8f1;border-radius:12px;outline:none;background:#fff;color:#0B1B3B}
+.field input:focus{border-color:#2E7DF6}
+.ubirow{display:flex;gap:8px;align-items:center}
+.ubibtn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#eef4ff;color:#2E7DF6;border:1px solid #d6e4ff;border-radius:12px;padding:12px;font-weight:800;font-size:14px;cursor:pointer}
+.coordtxt{font-size:12.5px;color:#7A879C;margin-top:7px;font-weight:700}
+.coordtxt.ok{color:#12A26A}
+.sheetact{display:flex;gap:10px;margin-top:10px}
+.guardar{flex:1;background:linear-gradient(135deg,#12A26A,#1BB97C);color:#fff;border:0;border-radius:14px;padding:15px;font-weight:800;font-size:16px;cursor:pointer}
+.guardar:disabled{opacity:.5}
+.cancelar{background:#f1f4f9;color:#7A879C;border:0;border-radius:14px;padding:15px 18px;font-weight:800;font-size:15px;cursor:pointer}
+.aviso{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 12px;font-size:13px;margin:4px 0 8px;display:none}
 </style></head><body>
 <div id='cargando'><div class='spin'></div>Cargando mapa nacional…</div>
 <div id='top'>
@@ -132,6 +160,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
  <div class='stat'><div class='ic azul'><svg viewBox='0 0 24 24' fill='#2E7DF6'><rect x='6' y='2' width='12' height='20' rx='3'/></svg></div><div><small>En esta vista</small><b id='sCerca'>0</b></div></div>
  <div class='stat'><div class='ic verde'><svg viewBox='0 0 24 24' fill='#12A26A'><path d='M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1z'/></svg></div><div><small>PayJoy (filtro)</small><b id='sComp'>0</b></div></div>
 </div>
+<button id='fab'>➕ Registrar negocio</button>
+<div id='tapbanner'>🗺️ Toca el mapa donde está el negocio</div>
+<div id='toast'></div>
+<div id='modal'><div class='sheet'>
+ <h2>Registrar negocio nuevo</h2>
+ <p class='sub'>Se guarda en la base y aparece en el mapa y en EB Mobile.</p>
+ <div class='field'><label>Nombre del negocio *</label><input id='rNombre' placeholder='Ej. Celulares López' autocomplete='off'></div>
+ <div class='field'><label>Giro</label><input id='rTipo' placeholder='Ej. Tienda de móviles' list='giros' autocomplete='off'><datalist id='giros'></datalist></div>
+ <div class='field'><label>Teléfono</label><input id='rTel' inputmode='tel' placeholder='10 dígitos' autocomplete='off'></div>
+ <div class='field'><label>Estado *</label><input id='rEstado' list='estadosdl' placeholder='Ej. Jalisco' autocomplete='off'><datalist id='estadosdl'></datalist></div>
+ <div class='field'><label>Municipio / Ciudad *</label><input id='rCiudad' list='ciudadesdl' placeholder='Ej. Zapopan' autocomplete='off'><datalist id='ciudadesdl'></datalist></div>
+ <div class='field'><label>Ubicación *</label>
+  <div class='ubirow'>
+   <button class='ubibtn' id='rGps'>📍 Usar mi ubicación</button>
+   <button class='ubibtn' id='rTap'>🗺️ Tocar el mapa</button>
+  </div>
+  <div class='coordtxt' id='rCoord'>Sin ubicación todavía</div>
+ </div>
+ <div class='aviso' id='rAviso'></div>
+ <div class='sheetact'>
+  <button class='cancelar' id='rCancel'>Cancelar</button>
+  <button class='guardar' id='rGuardar'>Guardar negocio</button>
+ </div>
+</div></div>
 <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
 <script src='https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js'></script>
 <script>
@@ -139,6 +191,9 @@ let PUNTOS=[];
 const $=function(id){return document.getElementById(id);};
 const ICON_PP="<svg viewBox='0 0 24 24'><rect x='6' y='2' width='12' height='20' rx='3'/><rect x='9' y='4' width='6' height='1.6' rx='.8' fill='#fff'/></svg>";
 const ICON_PJ="<svg viewBox='0 0 24 24'><path d='M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z'/></svg>";
+const ICON_NV="<svg viewBox='0 0 24 24'><path d='M12 2l2.4 7.2H22l-6 4.6 2.3 7.2L12 16.8 5.7 21l2.3-7.2L2 9.2h7.6z'/></svg>";
+function iconDe(p){return p.nuevo?ICON_NV:(p.cr?ICON_PJ:ICON_PP);}
+function claseDe(p){return p.nuevo?'nuevo':(p.cr?'pj':'p');}
 const CAP=350;
 const map=L.map('map',{preferCanvas:false,zoomControl:false}).setView([23.6,-102.5],5);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
@@ -152,8 +207,8 @@ function hav(a,b){const R=6371000,t=Math.PI/180,dlat=(b[0]-a[0])*t,dlng=(b[1]-a[
 function fmtDist(m){return m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';}
 function prox(m){return m<400?'📍 Muy cerca':m<1500?'✅ Cerca':m<6000?'🚶 Medio lejos':'🚗 Lejos';}
 function waLink(tel){var d=(tel||'').replace(/\D/g,'');if(!d)return '';var n=d.length===10?('52'+d):d;return 'https://wa.me/'+n;}
-function pinIcon(cr,sel){return L.divIcon({className:'',iconSize:[34,40],iconAnchor:[17,38],
- html:"<div class='pin "+(cr?'pj':'p')+(sel?' sel':'')+"'>"+(sel?"<span class='ripple'></span>":"")+"<span class='head'>"+(cr?ICON_PJ:ICON_PP)+"</span></div>"});}
+function pinIcon(p,sel){return L.divIcon({className:'',iconSize:[34,40],iconAnchor:[17,38],
+ html:"<div class='pin "+claseDe(p)+(sel?' sel':'')+"'>"+(sel?"<span class='ripple'></span>":"")+"<span class='head'>"+iconDe(p)+"</span></div>"});}
 
 function filtrar(){
  const q=($('q').value||'').trim().toLowerCase(),fe=$('fEstado').value,fc=$('fCiudad').value,ft=$('fTipo').value,fp=$('fPayjoy').checked;
@@ -169,16 +224,17 @@ function filtrar(){
  stats();pintar();if(listaOn)pintarLista();
  if(primera&&FILTRADOS.length){primera=false;}
 }
-function addPin(p){const m=L.marker([p.lat,p.lng],{icon:pinIcon(p.cr,selId===p.id),keyboard:false});
+function addPin(p){const m=L.marker([p.lat,p.lng],{icon:pinIcon(p,selId===p.id),keyboard:false});
  m.on('click',function(){seleccionar(p);});capa.addLayer(m);}
 function addDot(p){capaDots.addLayer(L.circleMarker([p.lat,p.lng],{renderer:canvasR,interactive:false,
- radius:4,color:'#fff',weight:1,fillColor:p.cr?'#12A26A':'#2E7DF6',fillOpacity:.9}));}
+ radius:p.nuevo?5:4,color:'#fff',weight:1,fillColor:p.nuevo?'#F5821F':(p.cr?'#12A26A':'#2E7DF6'),fillOpacity:.95}));}
 function pintar(){
  capa.clearLayers();capaDots.clearLayers();
  const b=map.getBounds(),z=map.getZoom();let n=0;
  for(const p of FILTRADOS){
   if(!b.contains([p.lat,p.lng]))continue;
   if(selId===p.id){addPin(p);continue;}
+  if(p.nuevo){addPin(p);continue;}
   if(z>=11){if(n<CAP){addPin(p);n++;}else addDot(p);}
   else addDot(p);
  }
@@ -194,17 +250,17 @@ function seleccionar(p){
  const dist=userLL?hav(userLL,[p.lat,p.lng]):null;
  $('cDist').textContent=dist!=null?(fmtDist(dist)+' · '+prox(dist)):((p.c?p.c+' · ':'')+p.e);
  $('cStar').innerHTML=p.r?('⭐ '+p.r):'';
- $('cTipo').className='tipo '+(p.cr?'pj':'pp');
- $('cTipo').innerHTML=(p.cr?ICON_PJ:ICON_PP)+(p.cr?'PayJoy / crédito':(p.t||'Negocio'));
+ $('cTipo').className='tipo '+(p.nuevo?'pj':(p.cr?'pj':'pp'));
+ $('cTipo').innerHTML=iconDe(p)+(p.nuevo?'Registrado en campo':(p.cr?'PayJoy / crédito':(p.t||'Negocio')));
  const q=p.lat+','+p.lng;
  $('cNav').href='https://www.google.com/maps/search/?api=1&query='+q;
  const wa=waLink(p.tel);
  if(wa){$('cWa').style.display='flex';$('cWa').href=wa;$('cWa').textContent=p.tel?('WA '+p.tel):'WhatsApp';}else{$('cWa').style.display='none';}
  $('cCopy').onclick=function(){try{navigator.clipboard.writeText(q);}catch(e){}$('cCopy').textContent='✓';setTimeout(function(){$('cCopy').textContent='⧉';},1200);};
- $('card').style.display='block';
+ $('card').style.display='block';$('fab').style.display='none';
  map.panTo([p.lat,p.lng]);pintar();
 }
-function cerrarCard(){$('card').style.display='none';selId=null;if(!listaOn)pintar();}
+function cerrarCard(){$('card').style.display='none';selId=null;if(!listaOn){$('fab').style.display='flex';pintar();}}
 function pintarLista(){
  const L2=$('lista');const arr=FILTRADOS.slice(0,400);
  L2.innerHTML=arr.map(function(p,i){return "<div class='litem' data-i='"+i+"'><div class='lic "+(p.cr?'pj':'')+"'>"+(p.cr?ICON_PJ:ICON_PP)+"</div>"
@@ -214,8 +270,8 @@ function pintarLista(){
 }
 $('lista').addEventListener('click',function(e){const it=e.target.closest('.litem');if(!it)return;
  const p=$('lista')._arr[+it.dataset.i];verMapa();seleccionar(p);map.setView([p.lat,p.lng],15);});
-function verMapa(){listaOn=false;$('segMapa').classList.add('on');$('segLista').classList.remove('on');$('lista').style.display='none';$('stats').style.display='flex';}
-function verLista(){listaOn=true;$('segLista').classList.add('on');$('segMapa').classList.remove('on');$('card').style.display='none';$('lista').style.display='block';$('stats').style.display='none';pintarLista();}
+function verMapa(){listaOn=false;$('segMapa').classList.add('on');$('segLista').classList.remove('on');$('lista').style.display='none';$('stats').style.display='flex';$('fab').style.display='flex';}
+function verLista(){listaOn=true;$('segLista').classList.add('on');$('segMapa').classList.remove('on');$('card').style.display='none';$('lista').style.display='block';$('stats').style.display='none';$('fab').style.display='none';pintarLista();}
 function llenarCiudades(){
  const e=$('fEstado').value,prev=$('fCiudad').value;
  $('fCiudad').innerHTML="<option value=''>Todas las ciudades</option>";
@@ -272,13 +328,79 @@ $('btnRuta').onclick=function(){
 };
 map.on('moveend',function(){if(!listaOn){pintar();stats();}});
 
+/* ====== REGISTRO DE NEGOCIOS (nacional) ====== */
+const SUPA_URL='https://ulokdlzgxeyioalcruub.supabase.co';
+const SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsb2tkbHpneGV5aW9hbGNydXViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NjU5NDgsImV4cCI6MjEwMDI0MTk0OH0.XdT2am-NtzvBhInmPlLcspcouuemuZUB_lasiaXXlBI';
+let CODIGO_REG='';try{CODIGO_REG=sessionStorage.getItem('reg_cod')||'';}catch(e){}
+let regLL=null, modoTap=false;
+function toast(t){var el=$('toast');el.textContent=t;el.style.display='block';setTimeout(function(){el.style.display='none';},2600);}
+function aviso(t){var el=$('rAviso');el.textContent=t;el.style.display='block';}
+function setCoord(lat,lng){regLL={lat:lat,lng:lng};var el=$('rCoord');el.textContent='✅ Ubicación lista ('+lat.toFixed(5)+', '+lng.toFixed(5)+')';el.classList.add('ok');}
+function abrirModal(){regLL=null;['rNombre','rTipo','rTel','rCiudad'].forEach(function(id){$(id).value='';});
+ $('rEstado').value=$('fEstado').value||'';
+ $('rCoord').textContent='Sin ubicación todavía';$('rCoord').classList.remove('ok');$('rAviso').style.display='none';
+ $('rGps').textContent='📍 Usar mi ubicación';$('modal').classList.add('show');}
+$('fab').onclick=function(){
+ if(!CODIGO_REG){var c=prompt('Código para registrar negocios (pídelo a Eduardo):');
+  if(c===null)return;c=(c||'').trim();if(!c)return;CODIGO_REG=c;try{sessionStorage.setItem('reg_cod',c);}catch(e){}}
+ abrirModal();
+};
+$('rCancel').onclick=function(){$('modal').classList.remove('show');modoTap=false;$('tapbanner').style.display='none';};
+$('rGps').onclick=function(){
+ if(!navigator.geolocation){alert('Sin GPS disponible. Usa "Tocar el mapa".');return;}
+ $('rGps').textContent='📍 Buscando…';
+ navigator.geolocation.getCurrentPosition(function(pos){setCoord(pos.coords.latitude,pos.coords.longitude);$('rGps').textContent='📍 Usar mi ubicación';},
+  function(){$('rGps').textContent='📍 Usar mi ubicación';aviso('No pude obtener tu ubicación. Activa permisos o usa "Tocar el mapa".');},{enableHighAccuracy:true,timeout:9000});
+};
+$('rTap').onclick=function(){$('modal').classList.remove('show');modoTap=true;$('tapbanner').style.display='block';};
+map.on('click',function(e){if(modoTap){setCoord(e.latlng.lat,e.latlng.lng);modoTap=false;$('tapbanner').style.display='none';$('modal').classList.add('show');}});
+$('rGuardar').onclick=async function(){
+ var nombre=$('rNombre').value.trim(), ciudad=$('rCiudad').value.trim(), estado=$('rEstado').value.trim();
+ $('rAviso').style.display='none';
+ if(!nombre){aviso('Escribe el nombre del negocio.');return;}
+ if(!estado){aviso('Escribe el estado.');return;}
+ if(!ciudad){aviso('Escribe el municipio o ciudad.');return;}
+ if(!regLL){aviso('Marca la ubicación: "Usar mi ubicación" o "Tocar el mapa".');return;}
+ $('rGuardar').disabled=true;$('rGuardar').textContent='Guardando…';
+ var tipo=$('rTipo').value.trim()||null, tel=$('rTel').value.trim()||null;
+ try{
+  var r=await fetch(SUPA_URL+'/rest/v1/rpc/registrar_prospecto_web',{method:'POST',
+   headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+SUPA_ANON,'Content-Type':'application/json'},
+   body:JSON.stringify({p_codigo:CODIGO_REG,p_nombre:nombre,p_ciudad:ciudad,p_tipo:tipo,p_telefono:tel,p_lat:regLL.lat,p_lng:regLL.lng,p_estado:estado})});
+  if(!r.ok){var tx=await r.text();
+   if(tx.indexOf('codigo_invalido')>=0){CODIGO_REG='';try{sessionStorage.removeItem('reg_cod');}catch(e){}
+    aviso('Código incorrecto. Cierra y vuelve a tocar "Registrar" para escribirlo bien.');}
+   else aviso('No se pudo guardar: '+tx.slice(0,120));
+   $('rGuardar').disabled=false;$('rGuardar').textContent='Guardar negocio';return;}
+  var p={id:'n'+Date.now(),n:nombre,c:ciudad,e:estado,t:tipo||'',tel:tel||'',r:null,cr:0,nuevo:true,lat:regLL.lat,lng:regLL.lng};
+  PUNTOS.push(p);
+  $('modal').classList.remove('show');
+  filtrar();seleccionar(p);map.setView([p.lat,p.lng],15);
+  toast('✅ "'+nombre+'" registrado');
+ }catch(e){aviso('No se pudo guardar: '+e.message);}
+ $('rGuardar').disabled=false;$('rGuardar').textContent='Guardar negocio';
+};
+async function cargarNuevos(){
+ try{
+  var r=await fetch(SUPA_URL+"/rest/v1/prospectos_nuevos?select=nombre,ciudad,estado,tipo,telefono,lat,lng&order=created_at.desc&limit=5000",
+   {headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+SUPA_ANON}});
+  if(!r.ok)return;
+  var arr=await r.json();
+  for(var i=0;i<arr.length;i++){var p=arr[i];if(p.lat==null||p.lng==null)continue;
+   PUNTOS.push({id:'n'+i,n:p.nombre,c:p.ciudad||'',e:p.estado||'',t:p.tipo||'',tel:p.telefono||'',r:null,cr:0,nuevo:true,lat:p.lat,lng:p.lng});}
+ }catch(e){}
+}
+
 fetch('chunks/manifest.json').then(r=>r.json()).then(async man=>{
  const partes=await Promise.all(man.archivos.map(fn=>fetch('chunks/'+fn).then(r=>r.json())));
  PUNTOS=partes.flat().map((p,i)=>({id:i,n:p.n,c:p.c,e:p.e,t:p.t,tel:p.tel,r:p.r,cr:p.cr,lat:p.la,lng:p.ln}));
- const estados=[...new Set(PUNTOS.map(p=>p.e))].sort((a,b)=>a.localeCompare(b,'es'));
- for(const e of estados){const o=document.createElement('option');o.value=e;o.textContent=e;$('fEstado').appendChild(o);}
+ await cargarNuevos();
+ const estados=[...new Set(PUNTOS.map(p=>p.e).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+ for(const e of estados){const o=document.createElement('option');o.value=e;o.textContent=e;$('fEstado').appendChild(o);
+  const o2=document.createElement('option');o2.value=e;$('estadosdl').appendChild(o2);}
  const tc={};for(const p of PUNTOS){const t=(p.t||'').trim();if(t)tc[t]=(tc[t]||0)+1;}
- Object.keys(tc).sort((a,b)=>tc[b]-tc[a]).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t+' ('+tc[t]+')';$('fTipo').appendChild(o);});
+ Object.keys(tc).sort((a,b)=>tc[b]-tc[a]).forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t+' ('+tc[t]+')';$('fTipo').appendChild(o);
+  const o2=document.createElement('option');o2.value=t;$('giros').appendChild(o2);});
  map.invalidateSize();
  filtrar();
  setTimeout(()=>{map.invalidateSize();pintar();},250);
