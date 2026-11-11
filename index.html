@@ -46,13 +46,16 @@ width:11px;height:11px;background:#fff;border-right:2px solid var(--azul);border
 .pin .head svg{width:17px;height:17px;fill:var(--azul)}
 .pin .ripple{position:absolute;bottom:-7px;left:50%;width:34px;height:13px;transform:translateX(-50%);border-radius:50%;
 background:radial-gradient(closest-side,rgba(46,125,246,.5),transparent)}
-.pin.nuevo .head{border-color:#12A26A;box-shadow:0 4px 8px rgba(18,162,106,.35)}
-.pin.nuevo .head:after{border-color:#12A26A}
-.pin.nuevo .head svg{fill:#12A26A}
 .pin.v .head{border-color:var(--rojo);box-shadow:0 4px 8px rgba(229,50,45,.35)}
 .pin.v .head:after{border-color:var(--rojo)}
 .pin.v .head svg{fill:var(--rojo)}
 .pin.v .ripple{background:radial-gradient(closest-side,rgba(229,50,45,.5),transparent)}
+.pin.nuevo .head{border-color:#F5821F;box-shadow:0 4px 8px rgba(245,130,31,.4)}
+.pin.nuevo .head:after{border-color:#F5821F}
+.pin.nuevo .head svg{fill:#F5821F}
+.pin.nuevo .ripple{background:radial-gradient(closest-side,rgba(245,130,31,.5),transparent)}
+.pin.nuevo.sel .ripple{animation:sonarN 1.5s ease-out infinite}
+@keyframes sonarN{0%{box-shadow:0 0 0 0 rgba(245,130,31,.45)}100%{box-shadow:0 0 0 26px rgba(245,130,31,0)}}
 .pin.sel .head{transform:translateX(-50%) scale(1.18)}
 .pin.sel .ripple{animation:sonar 1.5s ease-out infinite}
 @keyframes sonar{0%{box-shadow:0 0 0 0 rgba(46,125,246,.45)}100%{box-shadow:0 0 0 26px rgba(46,125,246,0)}}
@@ -264,13 +267,13 @@ function filtrar(){
 function addPin(x){const m=L.marker([x.p.lat,x.p.lng],{icon:pinIcon(x.v,selId===x.p.id,TP(x.p),x.p.nuevo),keyboard:false});
  m.on('click',function(){seleccionar(x);});capa.addLayer(m);}
 function addDot(x){capaDots.addLayer(L.circleMarker([x.p.lat,x.p.lng],{renderer:canvasR,interactive:false,
- radius:4,color:'#fff',weight:1,fillColor:x.v?'#E5322D':'#2E7DF6',fillOpacity:.9}));}
+ radius:x.p.nuevo?5:4,color:'#fff',weight:1,fillColor:x.p.nuevo?'#F5821F':(x.v?'#E5322D':'#2E7DF6'),fillOpacity:.95}));}
 function pintar(){
  capa.clearLayers();capaDots.clearLayers();
  const b=map.getBounds(),z=map.getZoom();let n=0;
  for(const x of FILTRADOS){
   if(!b.contains([x.p.lat,x.p.lng]))continue;
-  if(x.v||selId===x.p.id){addPin(x);continue;}   // visitados y el seleccionado: siempre pin
+  if(x.v||x.p.nuevo||selId===x.p.id){addPin(x);continue;}   // visitados, nuevos y el seleccionado: siempre pin
   if(z>=10){if(n<CAP){addPin(x);n++;}}           // acercado: pines bonitos
   else addDot(x);                                 // alejado: puntito canvas (rápido)
  }
