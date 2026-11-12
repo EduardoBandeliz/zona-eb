@@ -1,4 +1,9 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-12,19:02,Juan Carlos,refcom,Tepic,Nayarit,0,0,0,0,0,existente,,21.5149108,-104.8840785,
+2026-11-12,19:01,Antonio Arias,Telcel av. Siervo de la nación,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.688361,-101.2295418,
+2026-11-12,18:37,Antonio Arias,Telcel,,,0,0,0,0,0,existente,Jonathan Molina,19.6862388,-101.2257559,Regreso
+2026-11-12,18:21,Juan Carlos,capibara fix,,,0,0,0,0,0,existente,Kevin Bernal,,,
+2026-11-12,18:17,Antonio Arias,VIB Telcel,,,15,0,0,0,15,nuevo,,19.6968741,-101.2270327,
 2026-11-12,17:58,Juan Carlos,emporio celular,Tepic,Nayarit,0,0,0,0,0,existente,,21.5057814,-104.8942739,
 2026-11-12,17:56,Antonio Arias,Accesorios Yubi,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.6987279,-101.2286574,Ya tienen proveedor
 2026-11-12,17:52,Juan Carlos,texnocel,,,40,0,0,0,40,nuevo,,,,
