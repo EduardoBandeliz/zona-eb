@@ -1,6 +1,5 @@
 <!doctype html><html lang='es'><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover'>
-<meta http-equiv='refresh' content='3600'>
 <title>Mapa EB — Prospectos</title>
 <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'>
 <style>
@@ -201,13 +200,13 @@ const ZONA=LOCK?(VEND_ESTADOS[LOCK]||[]):null;
 // Embebido en EB Mobile (WebView nativo o iframe web) y con ?admin=1 => puede marcar.
 const EMBED=!!(window.ReactNativeWebView)||(window.parent&&window.parent!==window);
 const ADMIN=_p.get('admin')==='1'&&EMBED;
-const CAP=350;
+const CAP=200;
 const ICON_PP="<svg viewBox='0 0 24 24'><rect x='6' y='2' width='12' height='20' rx='3'/><rect x='9' y='4' width='6' height='1.6' rx='.8' fill='#fff'/></svg>";
 const ICON_PJ="<svg viewBox='0 0 24 24'><path d='M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z'/></svg>";
 function iconoDe(t){return t==='payjoy'?ICON_PJ:ICON_PP;}
 if(LOCK){document.getElementById('fVend').style.display='none';
  const l=document.getElementById('lblVend');l.textContent='👤 '+LOCK+(ZONA&&ZONA.length?' · '+ZONA.join(', '):'');l.style.display='inline-flex';}
-const map=L.map('map',{preferCanvas:false,zoomControl:false}).setView([19.7,-101.9],7);
+const map=L.map('map',{preferCanvas:true,zoomControl:false}).setView([19.7,-101.9],7);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
  {maxZoom:19,maxNativeZoom:16,attribution:'© Esri',updateWhenIdle:true,keepBuffer:1}).addTo(map);
 const canvasR=L.canvas({padding:.3});
@@ -270,12 +269,14 @@ function addDot(x){capaDots.addLayer(L.circleMarker([x.p.lat,x.p.lng],{renderer:
  radius:x.p.nuevo?5:4,color:'#fff',weight:1,fillColor:x.p.nuevo?'#F5821F':(x.v?'#E5322D':'#2E7DF6'),fillOpacity:.95}));}
 function pintar(){
  capa.clearLayers();capaDots.clearLayers();
- const b=map.getBounds(),z=map.getZoom();let n=0;
+ const b=map.getBounds().pad(0.15),z=map.getZoom();let n=0;   // pad: pequeño buffer para no recortar al borde
  for(const x of FILTRADOS){
-  if(!b.contains([x.p.lat,x.p.lng]))continue;
-  if(x.v||x.p.nuevo||selId===x.p.id){addPin(x);continue;}   // visitados, nuevos y el seleccionado: siempre pin
-  if(z>=10){if(n<CAP){addPin(x);n++;}}           // acercado: pines bonitos
-  else addDot(x);                                 // alejado: puntito canvas (rápido)
+  if(!b.contains([x.p.lat,x.p.lng]))continue;                 // solo lo que está en pantalla
+  if(selId===x.p.id){addPin(x);continue;}                     // el seleccionado: siempre pin bonito
+  // Acercado dibuja pines bonitos (incl. visitados/nuevos) hasta el tope; alejado o sobre el tope => puntito
+  // en canvas (rapidísimo). addDot ya colorea rojo=visitado, naranja=nuevo, azul=prospecto.
+  if(z>=11&&n<CAP){addPin(x);n++;}
+  else addDot(x);
  }
 }
 function stats(){
