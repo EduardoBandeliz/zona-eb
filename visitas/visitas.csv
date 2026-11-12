@@ -1,4 +1,15 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-12,17:58,Juan Carlos,emporio celular,Tepic,Nayarit,0,0,0,0,0,existente,,21.5057814,-104.8942739,
+2026-11-12,17:56,Antonio Arias,Accesorios Yubi,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.6987279,-101.2286574,Ya tienen proveedor
+2026-11-12,17:52,Juan Carlos,texnocel,,,40,0,0,0,40,nuevo,,,,
+2026-11-12,17:51,Juan Carlos,sinergia movil,,,0,0,0,0,0,nuevo,pato,,,
+2026-11-12,17:48,Antonio Arias,"Ciber Mark-PC, Soluciones para TI",Morelia,Michoacán,0,5,5,5,15,existente,Marco,19.701807,-101.229148,
+2026-11-12,17:45,Juan Carlos,cac Movistar,,,0,0,0,0,0,nuevo,,,,
+2026-11-12,17:39,Juan Carlos,taller tecnológico,Tepic,Nayarit,0,0,0,0,0,existente,,21.5019106,-104.8945049,
+2026-11-12,17:16,Antonio Arias,"Ciber Mark-PC, Soluciones para TI",Morelia,Michoacán,0,0,0,0,0,existente,Marco,19.701807,-101.229148,
+2026-11-12,17:11,Juan Carlos,puxxel store,Tepic,Nayarit,0,0,0,0,0,existente,,21.4989495,-104.8913061,
+2026-11-12,17:05,Juan Carlos,papelería el contador,Tepic,Nayarit,0,0,0,0,0,nuevo,no proporciona datos,21.4944556,-104.8947459,
+2026-11-12,17:04,Juan Carlos,multicel,,,0,0,0,0,0,nuevo,tere,,,
 2026-11-12,16:57,Juan Carlos,cecitec,,,0,0,0,0,0,nuevo,,,,
 2026-11-12,16:25,Juan Carlos,pc zona cerrado,,,0,0,0,0,0,existente,,,,
 2026-11-11,22:52,Antonio Arias,Papelería Holanda,,,0,0,0,0,0,existente,,19.6855907,-101.2042686,Ya tiene proveedor
