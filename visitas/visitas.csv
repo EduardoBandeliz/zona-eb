@@ -1,4 +1,9 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-13,17:56,Antonio Arias,Chips pedregal,Morelia,Michoacán,0,0,0,0,0,existente,,19.7086944,-101.1748977,
+2026-11-13,17:53,Juan Carlos,fdz cantera,,,0,0,0,0,0,existente,,,,
+2026-11-13,17:41,Antonio Arias,Soporte Morelia,Morelia,Michoacán,0,0,0,0,0,existente,,19.708234,-101.176573,No está el dueño
+2026-11-13,17:21,Antonio Arias,Compu Alex,Morelia,Michoacán,10,0,0,5,15,existente,,19.709609,-101.178065,
+2026-11-13,17:11,Antonio Arias,Papelería,,,0,0,0,0,0,existente,,19.7135725,-101.1785947,Ya tiene proveedor
 2026-11-13,17:02,Antonio Arias,Sisec,,,0,0,0,0,0,nuevo,,19.7133059,-101.1786663,
 2026-11-13,16:53,Juan Carlos,credi fácil,,,0,0,0,0,0,existente,julio cesar lo,,,
 2026-11-13,16:41,Juan Carlos,pc repair,,,0,0,0,0,0,existente,pc repair,,,
