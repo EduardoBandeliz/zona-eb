@@ -1,4 +1,7 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-17,17:49,Antonio Arias,Telcel Solidaridad,Morelia,Michoacán,5,0,5,5,15,nuevo,Geovanny,19.7320334,-101.2040236,
+2026-11-17,17:36,Antonio Arias,Reparacell,Morelia,Michoacán,5,5,5,5,20,existente,Patricia Rodriguez,19.7320453,-101.205835,
+2026-11-17,17:07,Antonio Arias,Starphons,Morelia,Michoacán,0,0,0,0,0,existente,,19.732714,-101.205588,Cerrado
 2026-11-14,19:21,Antonio Arias,TC iSolutions,Morelia,Michoacán,10,10,10,10,40,existente,Brayant Leon,19.723622,-101.222586,
 2026-11-14,19:16,Antonio Arias,Hospital de celulares,Morelia,Michoacán,0,0,0,0,0,nuevo,Marco,19.7217875,-101.2216088,Ya tiene proveedor
 2026-11-14,18:58,Antonio Arias,Multiservicios olpimia,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.7074222,-101.215442,No sé encuentra el dueño
