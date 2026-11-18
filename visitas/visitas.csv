@@ -1,4 +1,6 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-18,20:19,Antonio Arias,Telcel Lázaro Cárdenas,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.7024024,-101.2076387,
+2026-11-18,19:30,Antonio Arias,Móvil Plus Morelos,Morelia,Michoacán,10,10,10,10,40,existente,,19.695483,-101.1905435,
 2026-11-18,18:17,Antonio Arias,Móvil Plus Morelos,Morelia,Michoacán,0,0,0,0,0,nuevo,Jessica,19.695483,-101.1905435,
 2026-11-18,18:17,Juan Carlos,Kike célular,Tepic,Nayarit,0,0,0,0,0,existente,Enrique,21.5096098,-104.8953344,
 2026-11-18,18:10,Juan Carlos,adal electrónics,,,0,0,0,0,0,existente,,,,
