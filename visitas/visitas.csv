@@ -1,4 +1,11 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-18,18:17,Antonio Arias,Móvil Plus Morelos,Morelia,Michoacán,0,0,0,0,0,nuevo,Jessica,19.695483,-101.1905435,
+2026-11-18,18:17,Juan Carlos,Kike célular,Tepic,Nayarit,0,0,0,0,0,existente,Enrique,21.5096098,-104.8953344,
+2026-11-18,18:10,Juan Carlos,adal electrónics,,,0,0,0,0,0,existente,,,,
+2026-11-18,17:59,Antonio Arias,Móvil Plus,Morelia,Michoacán,0,0,0,0,0,nuevo,Jéssica,19.6960342,-101.1927079,
+2026-11-18,17:34,Juan Carlos,lu tecnológico,,,0,0,0,0,0,existente,,,,
+2026-11-18,17:34,Juan Carlos,nerd reparación celular,,,0,0,0,0,0,nuevo,,,,
+2026-11-18,17:25,Juan Carlos,inovacel,,,0,0,0,0,0,existente,,,,
 2026-11-17,22:32,Antonio Arias,REP-DUO,Morelia,Michoacán,0,0,0,0,0,existente,,19.668801,-101.199214,No hay nada
 2026-11-17,22:14,Antonio Arias,BYA IMPORTACIONES,Tarimbaro,Michoacán,0,0,0,0,0,existente,,19.673129,-101.204502,Ya tienen proveedor
 2026-11-17,20:50,Antonio Arias,iRepair,Morelia,Michoacán,10,0,10,10,30,existente,Sarahí,19.67436,-101.21227,
