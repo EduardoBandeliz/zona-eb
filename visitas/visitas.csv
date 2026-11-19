@@ -1,4 +1,6 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-19,19:07,Antonio Arias,CIBER CIMA,Morelia,Michoacán,0,0,0,0,0,existente,,19.694708,-101.289336,Calle privada
+2026-11-19,18:25,Antonio Arias,Ciber,,,0,0,0,0,0,nuevo,,19.6785552,-101.3044776,Ya tiene proveedor
 2026-11-19,18:00,Antonio Arias,Rodricell,,,0,0,0,0,0,existente,,19.6919187,-101.2983706,Marcaba negocio pero es privada
 2026-11-19,17:46,Antonio Arias,Motor Cell,,,0,0,0,10,10,nuevo,Ignacio Ruiz,19.6990935,-101.2728251,
 2026-11-19,17:26,Antonio Arias,MedicalPhone,Morelia,Michoacán,10,0,10,20,40,existente,Victor Lopez,19.69695,-101.25465,
