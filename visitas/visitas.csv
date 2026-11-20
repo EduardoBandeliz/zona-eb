@@ -1,4 +1,9 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-20,18:12,Juan Carlos,maycel,Tepic,Nayarit,0,0,0,0,0,existente,,21.5103887,-104.8950664,
+2026-11-20,18:10,Antonio Arias,Diccsa,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.6876746,-101.1501743,Ya tiene proveedor yaavs
+2026-11-20,18:07,Antonio Arias,Casica,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.687216,-101.1500497,No sé encuentra el dueño
+2026-11-20,18:03,Antonio Arias,Case ica,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.687256,-101.1506394,No sé encuentra el dueño
+2026-11-20,17:51,Antonio Arias,Micro House Morelia,Morelia,Michoacán,0,0,0,0,0,existente,,19.68759,-101.150429,Únicamente servicio apple
 2026-11-20,16:37,Juan Carlos,blom,,,0,0,0,0,0,existente,morales,,,
 2026-11-19,23:25,Antonio Arias,Reparación de Celulares,Morelia,Michoacán,0,0,0,0,0,existente,,19.704428,-101.225107,Ya tienen proveedor yaavs
 2026-11-19,22:53,Antonio Arias,"Servicio Tecnico y Microsoldadura, Reparación de celulares tabletas y bocinas amplificadas",Morelia,Michoacán,0,0,0,0,0,existente,,19.691882,-101.253439,Cerrado
