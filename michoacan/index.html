@@ -437,6 +437,14 @@ const CANON_BY_NK={"apatzingan":"Apatzingán","lazaro cardenas":"Lázaro Cárden
 function kmMorelia(c,lat,lng){if(typeof KM_MORELIA!=='undefined'&&KM_MORELIA[c]!=null)return KM_MORELIA[c];return Math.round(hav(MORELIA,[lat,lng])/1000*1.3);}
 function nkMuni(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');}
 function canonMuni(c){return (typeof CANON_BY_NK!=='undefined'&&CANON_BY_NK[nkMuni(c)])||c;}
+var EXC_NOMBRE=["elektra","megacable","oxxo","la marina","steren","walmart","bodega aurrera","aurrera","coppel","telmex","macropay","empeno","prendamex","monte de piedad","first cash","montepio","presta prenda","banco azteca"];
+var EXC_TIPO=["tienda de alimentacion","supermercado","mercado","tienda de ropa","zapateria","tienda de neumaticos","electricista","restaurante","cafeteria","panaderia","pasteleria","tienda de postres","tienda de golosinas","tienda de bebidas alcoholicas","gasolinera","floristeria","grandes almacenes","centro comercial"];
+var EXC_GIRO=["llantera","llantas","vulcani","zapateria","calzado","electricidad","materiales electricos","mueble","abarrotes","carniceria","tortilleria","fruteria","taqueria"];
+function esProspecto(p){var n=nkMuni(p.n),t=nkMuni(p.t),i;
+ for(i=0;i<EXC_NOMBRE.length;i++)if(n.indexOf(EXC_NOMBRE[i])>=0)return false;
+ for(i=0;i<EXC_TIPO.length;i++)if(t.indexOf(EXC_TIPO[i])>=0)return false;
+ for(i=0;i<EXC_GIRO.length;i++)if(n.indexOf(EXC_GIRO[i])>=0)return false;
+ return true;}
 function medNum(a){a=a.slice().sort(function(x,y){return x-y;});var n=a.length;return n?(n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2):0;}
 function retagOutliers(){
  function cen(){var m={};PUNTOS.forEach(function(p){if(p.nuevo)return;var k=p.c||'?';if(!m[k])m[k]={la:[],ln:[]};m[k].la.push(p.lat);m[k].ln.push(p.lng);});
@@ -674,7 +682,7 @@ async function cargarNuevos(){
 }
 
 (async function init(){
- PUNTOS=DATA.map(function(p,i){return {id:i,n:p.n,c:p.c,t:p.t,tel:p.tel,r:p.r,cr:p.cr,lat:p.la,lng:p.ln};});
+ PUNTOS=DATA.filter(esProspecto).map(function(p,i){return {id:i,n:p.n,c:p.c,t:p.t,tel:p.tel,r:p.r,cr:p.cr,lat:p.la,lng:p.ln};});
  await cargarNuevos();
  for(var ci=0;ci<PUNTOS.length;ci++){PUNTOS[ci].c=canonMuni(PUNTOS[ci].c);}
  retagOutliers();
