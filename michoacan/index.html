@@ -115,6 +115,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .cancelar{background:#f1f4f9;color:#7A879C;border:0;border-radius:14px;padding:15px 18px;font-weight:800;font-size:15px;cursor:pointer}
 .aviso{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 12px;font-size:13px;margin:4px 0 8px;display:none}
 #toast{position:absolute;z-index:4000;left:50%;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0B1B3B;color:#fff;padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:none}
+#rutas{position:absolute;inset:0;top:0;z-index:1100;background:#f3f6fa;overflow-y:auto;padding:calc(168px + env(safe-area-inset-top)) 14px 40px;display:none}
+.rtitulo{font-size:16px;font-weight:800;color:var(--ink);margin:2px 2px 4px}
+.rsubtit{font-size:12.5px;color:var(--mut);font-weight:600;margin:0 2px 12px;line-height:1.35}
+.rsearch{display:flex;align-items:center;gap:9px;background:#fff;border-radius:14px;padding:11px 14px;box-shadow:0 4px 16px rgba(11,27,59,.08);margin-bottom:12px}
+.rsearch input{border:0;outline:0;font-size:15px;width:100%;background:transparent;color:var(--ink)}
+.rsearch svg{width:17px;height:17px;fill:none;stroke:var(--mut);stroke-width:2}
+.rdiv{font-size:11.5px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin:16px 4px 8px}
+.rmuni{display:flex;align-items:center;gap:12px;background:#fff;border-radius:15px;padding:13px 14px;margin-bottom:9px;box-shadow:0 4px 16px rgba(11,27,59,.07);cursor:pointer}
+.rmuni .rm-ic{width:40px;height:40px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;background:#eef0ff;font-size:19px}
+.rmuni .rm-b{flex:1;min-width:0}
+.rmuni .rm-b b{font-size:14.5px;font-weight:800;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmuni .rm-b small{color:var(--mut);font-size:12.5px}
+.rmuni .rm-n{color:#6D5DF6;font-weight:800;font-size:13px;white-space:nowrap}
+.rmuni.mor{opacity:.62}
+.rback{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #e3e9f1;border-radius:12px;padding:9px 13px;font-size:13.5px;font-weight:800;color:var(--eb);box-shadow:0 4px 14px rgba(11,27,59,.08);cursor:pointer;margin-bottom:12px}
+.rcard{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 6px 20px rgba(11,27,59,.08)}
+.rcard h3{font-size:17px;font-weight:800;margin:0 0 3px}
+.rcard .rc-sub{color:var(--mut);font-size:13px;font-weight:600}
+.rinicio{display:flex;gap:8px;margin-top:12px}
+.rbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#eef4ff;color:var(--eb);border:1px solid #d6e4ff;border-radius:12px;padding:11px;font-weight:800;font-size:13.5px;cursor:pointer}
+.rbtn.on{background:#eae9ff;color:#5B46E0;border-color:#c7bffb}
+.rfila{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.rfila label{font-size:13px;font-weight:700;color:var(--ink)}
+.rfila select{font-size:14px;padding:9px 11px;border:1px solid #e3e9f1;border-radius:11px;background:#fff;color:var(--ink);outline:none}
+.rnota{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:11px;padding:10px 12px;font-size:12.5px;line-height:1.4;margin-top:12px}
+.rgo{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:linear-gradient(135deg,#6D5DF6,#8B5CF6);color:#fff;font-weight:800;font-size:14.5px;padding:13px;border-radius:13px;text-decoration:none;box-shadow:0 8px 20px rgba(109,93,246,.32);margin-top:10px;border:0;cursor:pointer}
+.rgo.ghost{background:#fff;color:#6D5DF6;border:1.5px solid #c7bffb;box-shadow:none}
+.rstep{display:flex;align-items:center;gap:11px;background:#fff;border-radius:14px;padding:12px 13px;margin-bottom:9px;box-shadow:0 4px 14px rgba(11,27,59,.06)}
+.rstep .rs-num{width:30px;height:30px;border-radius:50%;flex:none;background:linear-gradient(135deg,#6D5DF6,#8B5CF6);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.rstep .rs-b{flex:1;min-width:0}
+.rstep .rs-b b{font-size:14px;font-weight:800;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rstep .rs-b small{color:var(--mut);font-size:12px}
+.rstep .rs-wa{flex:none;width:40px;height:40px;border-radius:11px;background:#1DAA52;color:#fff;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:17px}
+.rstep.nv .rs-num{background:linear-gradient(135deg,#F5821F,#FF9F45)}
 </style></head><body>
 <div id='cargando'><div class='spin'></div>Cargando mapa de Michoacán…</div>
 <div id='top'>
@@ -127,6 +161,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class='seg'>
    <button id='segMapa' class='on'><svg viewBox='0 0 24 24'><path d='M9 4l6 2 6-2v14l-6 2-6-2-6 2V6z'/><path d='M9 4v14M15 6v14'/></svg>Mapa</button>
    <button id='segLista'><svg viewBox='0 0 24 24'><path d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01'/></svg>Lista</button>
+   <button id='segRutas'><svg viewBox='0 0 24 24'><path d='M4 18l6-3 4 3 6-3'/><circle cx='4' cy='18' r='1.6' fill='currentColor' stroke='none'/><circle cx='20' cy='15' r='1.6' fill='currentColor' stroke='none'/><path d='M8 7h6a3 3 0 0 1 0 6H9'/></svg>Rutas</button>
   </div>
   <button class='loc' id='btnLoc'><svg viewBox='0 0 24 24'><circle cx='12' cy='12' r='7'/><path d='M12 2v3M12 19v3M2 12h3M19 12h3'/></svg></button>
   <button class='loc emo' id='btnHeat' title='Densidad de prospectos'>🔥</button>
@@ -142,6 +177,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <div id='map'></div>
 <div id='lista'></div>
+<div id='rutas'></div>
 <div id='tapbanner'>🗺️ Toca el mapa donde está el negocio</div>
 <div id='munihelp'>🏘️ Toca un municipio para ver sus negocios</div>
 <div id='card'>
@@ -278,10 +314,12 @@ function pintarLista(){
 }
 $('lista').addEventListener('click',function(e){const it=e.target.closest('.litem');if(!it)return;
  const p=$('lista')._arr[+it.dataset.i];verMapa();seleccionar(p);map.setView([p.lat,p.lng],15);});
-function verMapa(){listaOn=false;$('segMapa').classList.add('on');$('segLista').classList.remove('on');$('lista').style.display='none';$('stats').style.display='flex';$('fab').style.display='flex';}
-function verLista(){if(muniOn)apagarMuni();listaOn=true;$('segLista').classList.add('on');$('segMapa').classList.remove('on');$('card').style.display='none';$('lista').style.display='block';$('stats').style.display='none';$('fab').style.display='none';pintarLista();}
+function _segOff(){$('segMapa').classList.remove('on');$('segLista').classList.remove('on');$('segRutas').classList.remove('on');}
+function verMapa(){listaOn=false;rutasOn=false;_segOff();$('segMapa').classList.add('on');$('lista').style.display='none';$('rutas').style.display='none';$('stats').style.display='flex';$('fab').style.display='flex';}
+function verLista(){if(muniOn)apagarMuni();listaOn=true;rutasOn=false;_segOff();$('segLista').classList.add('on');$('card').style.display='none';$('lista').style.display='block';$('rutas').style.display='none';$('stats').style.display='none';$('fab').style.display='none';pintarLista();}
+function verRutas(){if(muniOn)apagarMuni();listaOn=false;rutasOn=true;_segOff();$('segRutas').classList.add('on');$('card').style.display='none';$('lista').style.display='none';$('rutas').style.display='block';$('stats').style.display='none';$('fab').style.display='none';rutasInit();}
 $('cClose').onclick=cerrarCard;
-$('segMapa').onclick=verMapa;$('segLista').onclick=verLista;
+$('segMapa').onclick=verMapa;$('segLista').onclick=verLista;$('segRutas').onclick=verRutas;
 $('btnFiltrar').onclick=function(){$('panel').classList.toggle('show');};
 $('q').oninput=filtrar;$('fTipo').onchange=filtrar;$('fPayjoy').onchange=filtrar;$('fNuevos').onchange=filtrar;
 $('fCiudad').onchange=function(){const c=$('fCiudad').value;if(c){const pts=PUNTOS.filter(p=>p.c===c).map(p=>[p.lat,p.lng]);if(pts.length){try{map.fitBounds(pts,{padding:[50,50],maxZoom:13});}catch(x){}}}filtrar();};
@@ -326,7 +364,7 @@ $('btnRuta').onclick=function(){
  $('rutaGo').style.display='block';
 };
 let _rp=0;function pintarSuave(){if(_rp)return;_rp=requestAnimationFrame(function(){_rp=0;pintar();stats();});}
-map.on('moveend',function(){if(!listaOn&&!muniOn){pintarSuave();}});
+map.on('moveend',function(){if(!listaOn&&!muniOn&&!rutasOn){pintarSuave();}});
 
 /* ====== VISTA POR MUNICIPIOS ====== */
 var capaMuni=L.layerGroup(); var muniOn=false; var MUNIS=[];
@@ -361,6 +399,115 @@ $('btnMuni').onclick=function(){
  calcMunis();dibujarMunis();capaMuni.addTo(map);
  try{map.fitBounds(PUNTOS.filter(function(p){return !p.nuevo;}).map(function(p){return[p.lat,p.lng];}),{padding:[40,40],maxZoom:9});}catch(e){}
 };
+
+/* ====== RUTAS POR MUNICIPIO (foráneas) ====== */
+var rutasOn=false;
+var capaRutaM=L.layerGroup();
+var rutaSel={c:null,orden:[],pts:[],start:null,startLbl:'',centro:null};
+var rutaModoGps=false;
+var RUTA_PER=10;
+function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esMorelia(c){return (c||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').indexOf('morelia')>=0;}
+function nnOrden(start,pts){
+ var rest=pts.slice(),out=[],cur=start;
+ while(rest.length){var bi=0,bd=Infinity;for(var j=0;j<rest.length;j++){var d=hav(cur,[rest[j].lat,rest[j].lng]);if(d<bd){bd=d;bi=j;}}var nx=rest.splice(bi,1)[0];out.push(nx);cur=[nx.lat,nx.lng];}
+ return out;
+}
+function buildTramos(start,orden,per){
+ var tramos=[];
+ for(var i=0;i<orden.length;i+=per){
+  var chunk=orden.slice(i,i+per);
+  var origin=i===0?start:[orden[i-1].lat,orden[i-1].lng];
+  var pathPts=[origin].concat(chunk.map(function(p){return [p.lat,p.lng];}));
+  var url='https://www.google.com/maps/dir/'+pathPts.map(function(a){return a[0]+','+a[1];}).join('/');
+  tramos.push({desde:i+1,hasta:i+chunk.length,pts:chunk,url:url});
+ }
+ return tramos;
+}
+function rutasInit(){
+ calcMunis();
+ $('rutas').innerHTML=
+  "<div class='rtitulo'>🧭 Armar ruta de venta</div>"
+  +"<div class='rsubtit'>Elige un municipio foráneo (fuera de Morelia). Juntamos todos sus negocios —base + los nuevos de campo—, los ordenamos en la ruta más corta y los abres en Google Maps.</div>"
+  +"<div class='rsearch'><svg viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M21 21l-4-4'/></svg><input id='rqMuni' placeholder='Buscar municipio (Zamora, Uruapan…)'></div>"
+  +"<div id='rutasBody'></div>";
+ $('rqMuni').oninput=function(){rutasBody(this.value);};
+ rutasBody('');
+}
+function rutasBody(q){
+ q=(q||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+ function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+ var lista=MUNIS.filter(function(o){return !q||norm(o.c).indexOf(q)>=0;});
+ var fr=lista.filter(function(o){return !esMorelia(o.c);});
+ var mo=lista.filter(function(o){return esMorelia(o.c);});
+ function item(o){return "<div class='rmuni"+(esMorelia(o.c)?' mor':'')+"' data-c=\""+esc(o.c)+"\"><div class='rm-ic'>🏙️</div><div class='rm-b'><b>"+esc(o.c)+"</b><small>"+o.n+" negocio"+(o.n===1?'':'s')+(o.pj?' · '+o.pj+' PayJoy':'')+(o.nv?' · '+o.nv+' nuevos':'')+"</small></div><div class='rm-n'>Armar ›</div></div>";}
+ var h='';
+ if(fr.length)h+="<div class='rdiv'>Destinos foráneos ("+fr.length+")</div>"+fr.map(item).join('');
+ else h+="<div class='rsubtit' style='text-align:center;margin-top:24px'>Sin municipios con ese nombre.</div>";
+ if(mo.length)h+="<div class='rdiv'>Dentro de Morelia (no es foránea)</div>"+mo.map(item).join('');
+ var b=$('rutasBody');b.innerHTML=h;
+ b.querySelectorAll('.rmuni').forEach(function(it){it.onclick=function(){rutasPick(it.dataset.c);};});
+}
+function rutasPick(c){
+ rutaSel.c=c;
+ rutaSel.pts=PUNTOS.filter(function(p){return p.c===c;});
+ var mu=MUNIS.filter(function(o){return o.c===c;})[0];
+ rutaSel.centro=mu?[mu.lat,mu.lng]:(rutaSel.pts.length?[rutaSel.pts[0].lat,rutaSel.pts[0].lng]:[19.7,-101.19]);
+ rutaModoGps=false;
+ rutasDetalle();
+}
+function rutaCalcStart(){
+ if(rutaModoGps&&userLL){rutaSel.start=userLL;rutaSel.startLbl='tu ubicación 📍';}
+ else{rutaSel.start=rutaSel.centro;rutaSel.startLbl='centro del municipio';}
+}
+function rutasDetalle(){
+ rutaCalcStart();
+ rutaSel.orden=nnOrden(rutaSel.start,rutaSel.pts);
+ var orden=rutaSel.orden,c=rutaSel.c,total=orden.length;
+ var tramos=buildTramos(rutaSel.start,orden,RUTA_PER);
+ var pj=rutaSel.pts.filter(function(p){return p.cr;}).length;
+ var nv=rutaSel.pts.filter(function(p){return p.nuevo;}).length;
+ var h="<div class='rback' id='rBack'>‹ Cambiar destino</div>"
+  +"<div class='rcard'><h3>"+esc(c)+"</h3><div class='rc-sub'>"+total+" negocio"+(total===1?'':'s')+" en ruta"+(pj?' · '+pj+' PayJoy':'')+(nv?' · '+nv+' nuevos':'')+"</div>"
+  +"<div class='rinicio'><button class='rbtn"+(!rutaModoGps?' on':'')+"' id='rStCen'>🏙️ Desde el municipio</button><button class='rbtn"+(rutaModoGps?' on':'')+"' id='rStGps'>📍 Desde mi ubicación</button></div>"
+  +"<div class='rfila'><label>Paradas por salida</label><select id='rPer'><option value='8'>8</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select><span style='font-size:12px;color:var(--mut);font-weight:600'>inicia en "+esc(rutaSel.startLbl)+"</span></div>"
+  +"</div>";
+ h+="<button class='rgo ghost' id='rVerMapa'>🗺️ Ver la ruta en el mapa</button>";
+ if(tramos.length<=1){
+  h+="<a class='rgo' href='"+tramos[0].url+"' target='_blank' rel='noopener'>🧭 Abrir en Google Maps ("+tramos[0].pts.length+" paradas)</a>";
+ }else{
+  h+="<div class='rnota'>⚠️ Google Maps abre pocas paradas por ruta, así que la dividimos en "+tramos.length+" tramos. Ábrelos uno por uno: cada tramo arranca donde terminó el anterior, así no pierdes el orden.</div>";
+  tramos.forEach(function(t,i){h+="<a class='rgo' href='"+t.url+"' target='_blank' rel='noopener'>🧭 Tramo "+(i+1)+" — paradas "+t.desde+" a "+t.hasta+"</a>";});
+ }
+ h+="<div class='rdiv'>Orden de visita</div>";
+ h+=orden.map(function(p,i){
+  var wa=waLink(p.tel);
+  return "<div class='rstep"+(p.nuevo?' nv':'')+"'><div class='rs-num'>"+(i+1)+"</div><div class='rs-b'><b>"+esc(p.n||'Negocio')+"</b><small>"+esc(p.t||(p.nuevo?'Registrado en campo':'Negocio'))+(p.tel?' · '+esc(p.tel):'')+"</small></div>"+(wa?"<a class='rs-wa' href='"+wa+"' target='_blank' rel='noopener'>💬</a>":"")+"</div>";
+ }).join('');
+ var el=$('rutas');el.innerHTML=h;el.scrollTop=0;
+ $('rBack').onclick=rutasInit;
+ $('rStCen').onclick=function(){rutaModoGps=false;rutasDetalle();};
+ $('rStGps').onclick=function(){
+  if(userLL){rutaModoGps=true;rutasDetalle();return;}
+  if(!navigator.geolocation){toast('Tu dispositivo no permite ubicación.');return;}
+  toast('Buscando tu ubicación…');
+  navigator.geolocation.getCurrentPosition(function(pos){userLL=[pos.coords.latitude,pos.coords.longitude];rutaModoGps=true;rutasDetalle();},function(){toast('No pude obtener tu ubicación.');},{enableHighAccuracy:true,timeout:9000});
+ };
+ var sel=$('rPer');sel.value=String(RUTA_PER);sel.onchange=function(){RUTA_PER=+sel.value;rutasDetalle();};
+ $('rVerMapa').onclick=rutasDibujarEnMapa;
+}
+function rutasDibujarEnMapa(){
+ if(!rutaSel.orden||!rutaSel.orden.length)return;
+ capaRutaM.clearLayers();
+ var lls=[rutaSel.start].concat(rutaSel.orden.map(function(p){return [p.lat,p.lng];}));
+ L.polyline(lls,{color:'#6D5DF6',weight:4,opacity:.85,dashArray:'6,8'}).addTo(capaRutaM);
+ L.marker(rutaSel.start,{icon:L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],html:"<div style='width:22px;height:22px;border-radius:50%;background:#0B1B3B;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)'></div>"})}).addTo(capaRutaM);
+ rutaSel.orden.forEach(function(p,i){L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',iconSize:[26,26],iconAnchor:[13,13],html:"<div style='width:26px;height:26px;border-radius:50%;background:"+(p.nuevo?'#F5821F':'#6D5DF6')+";color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3)'>"+(i+1)+"</div>"})}).on('click',function(){verMapa();seleccionar(p);}).addTo(capaRutaM);});
+ if(!map.hasLayer(capaRutaM))capaRutaM.addTo(map);
+ verMapa();
+ try{map.fitBounds(lls,{padding:[60,60]});}catch(e){}
+ toast('Ruta de '+rutaSel.c+' dibujada en el mapa');
+}
 
 /* ====== REGISTRO DE NEGOCIOS ====== */
 let regLL=null, modoTap=false;
