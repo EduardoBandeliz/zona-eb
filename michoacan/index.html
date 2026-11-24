@@ -420,6 +420,8 @@ var rutaModoGps=false;
 var RUTA_PER=10;
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function esMorelia(c){return (c||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').indexOf('morelia')>=0;}
+var MORELIA=[19.7008,-101.1844];
+function kmMorelia(o){return Math.round(hav(MORELIA,[o.lat,o.lng])/1000);}
 function nnOrden(start,pts){
  var rest=pts.slice(),out=[],cur=start;
  while(rest.length){var bi=0,bd=Infinity;for(var j=0;j<rest.length;j++){var d=hav(cur,[rest[j].lat,rest[j].lng]);if(d<bd){bd=d;bi=j;}}var nx=rest.splice(bi,1)[0];out.push(nx);cur=[nx.lat,nx.lng];}
@@ -440,7 +442,7 @@ function rutasInit(){
  calcMunis();
  $('rutas').innerHTML=
   "<div class='rtitulo'>🧭 Armar ruta de venta</div>"
-  +"<div class='rsubtit'>Elige un municipio foráneo (fuera de Morelia). Juntamos todos sus negocios —base + los nuevos de campo—, los ordenamos en la ruta más corta y los abres en Google Maps.</div>"
+  +"<div class='rsubtit'>Elige un municipio foráneo (fuera de Morelia). Verás los km desde Morelia (línea recta, aprox.) para planear el viaje. Juntamos todos sus negocios —base + los nuevos de campo—, los ordenamos en la ruta más corta y los abres en Google Maps.</div>"
   +"<div class='rsearch'><svg viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M21 21l-4-4'/></svg><input id='rqMuni' placeholder='Buscar municipio (Zamora, Uruapan…)'></div>"
   +"<div id='rutasBody'></div>";
  $('rqMuni').oninput=function(){rutasBody(this.value);};
@@ -452,7 +454,7 @@ function rutasBody(q){
  var lista=MUNIS.filter(function(o){return !q||norm(o.c).indexOf(q)>=0;});
  var fr=lista.filter(function(o){return !esMorelia(o.c);});
  var mo=lista.filter(function(o){return esMorelia(o.c);});
- function item(o){return "<div class='rmuni"+(esMorelia(o.c)?' mor':'')+"' data-c=\""+esc(o.c)+"\"><div class='rm-ic'>🏙️</div><div class='rm-b'><b>"+esc(o.c)+"</b><small>"+o.n+" negocio"+(o.n===1?'':'s')+(o.pj?' · '+o.pj+' PayJoy':'')+(o.nv?' · '+o.nv+' nuevos':'')+"</small></div><div class='rm-n'>Armar ›</div></div>";}
+ function item(o){return "<div class='rmuni"+(esMorelia(o.c)?' mor':'')+"' data-c=\""+esc(o.c)+"\"><div class='rm-ic'>🏙️</div><div class='rm-b'><b>"+esc(o.c)+"</b><small>"+(esMorelia(o.c)?'📍 Morelia (base)':'🚗 '+kmMorelia(o)+' km de Morelia')+" · "+o.n+" negocio"+(o.n===1?'':'s')+(o.pj?' · '+o.pj+' PayJoy':'')+(o.nv?' · '+o.nv+' nuevos':'')+"</small></div><div class='rm-n'>Armar ›</div></div>";}
  var h='';
  if(fr.length)h+="<div class='rdiv'>Destinos foráneos ("+fr.length+")</div>"+fr.map(item).join('');
  else h+="<div class='rsubtit' style='text-align:center;margin-top:24px'>Sin municipios con ese nombre.</div>";
@@ -480,7 +482,7 @@ function rutasDetalle(){
  var pj=rutaSel.pts.filter(function(p){return p.cr;}).length;
  var nv=rutaSel.pts.filter(function(p){return p.nuevo;}).length;
  var h="<div class='rback' id='rBack'>‹ Cambiar destino</div>"
-  +"<div class='rcard'><h3>"+esc(c)+"</h3><div class='rc-sub'>"+total+" negocio"+(total===1?'':'s')+" en ruta"+(pj?' · '+pj+' PayJoy':'')+(nv?' · '+nv+' nuevos':'')+"</div>"
+  +"<div class='rcard'><h3>"+esc(c)+"</h3><div class='rc-sub'>"+(esMorelia(c)?'📍 Morelia':'🚗 '+Math.round(hav(MORELIA,rutaSel.centro)/1000)+' km de Morelia')+" · "+total+" negocio"+(total===1?'':'s')+(pj?' · '+pj+' PayJoy':'')+(nv?' · '+nv+' nuevos':'')+"</div>"
   +"<div class='rinicio'><button class='rbtn"+(!rutaModoGps?' on':'')+"' id='rStCen'>🏙️ Desde el municipio</button><button class='rbtn"+(rutaModoGps?' on':'')+"' id='rStGps'>📍 Desde mi ubicación</button></div>"
   +"<div class='rfila'><label>Paradas por salida</label><select id='rPer'><option value='8'>8</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select><span style='font-size:12px;color:var(--mut);font-weight:600'>inicia en "+esc(rutaSel.startLbl)+"</span></div>"
   +"</div>";
