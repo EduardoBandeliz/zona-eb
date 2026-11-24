@@ -200,12 +200,12 @@ const $=function(id){return document.getElementById(id);};
 const ICON_PP="<svg viewBox='0 0 24 24'><rect x='6' y='2' width='12' height='20' rx='3'/><rect x='9' y='4' width='6' height='1.6' rx='.8' fill='#fff'/></svg>";
 const ICON_PJ="<svg viewBox='0 0 24 24'><path d='M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z'/></svg>";
 const ICON_NV="<svg viewBox='0 0 24 24'><path d='M12 2l2.4 7.2H22l-6 4.6 2.3 7.2L12 16.8 5.7 21l2.3-7.2L2 9.2h7.6z'/></svg>";
-const CAP=350;
+const CAP=160;
 function icon(p){return p.nuevo?ICON_NV:(p.cr?ICON_PJ:ICON_PP);}
 function clase(p){return p.nuevo?'nuevo':(p.cr?'pj':'p');}
-const map=L.map('map',{preferCanvas:false,zoomControl:false}).setView([19.22,-101.91],8);
+const map=L.map('map',{preferCanvas:true,zoomControl:false,zoomAnimation:true,markerZoomAnimation:false}).setView([19.22,-101.91],8);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
- {maxZoom:19,maxNativeZoom:16,attribution:'© Esri',updateWhenIdle:true,keepBuffer:1}).addTo(map);
+ {maxZoom:19,maxNativeZoom:16,attribution:'© Esri',updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1}).addTo(map);
 const canvasR=L.canvas({padding:.3});
 const capa=L.layerGroup().addTo(map);
 const capaDots=L.layerGroup().addTo(map);
@@ -325,7 +325,8 @@ $('btnRuta').onclick=function(){
  $('rutaGo').textContent='🧭 Abrir ruta de '+ruta.length+' paradas en Google Maps';
  $('rutaGo').style.display='block';
 };
-map.on('moveend',function(){if(!listaOn&&!muniOn){pintar();stats();}});
+let _rp=0;function pintarSuave(){if(_rp)return;_rp=requestAnimationFrame(function(){_rp=0;pintar();stats();});}
+map.on('moveend',function(){if(!listaOn&&!muniOn){pintarSuave();}});
 
 /* ====== VISTA POR MUNICIPIOS ====== */
 var capaMuni=L.layerGroup(); var muniOn=false; var MUNIS=[];
