@@ -122,6 +122,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .rsearch input{border:0;outline:0;font-size:15px;width:100%;background:transparent;color:var(--ink)}
 .rsearch svg{width:17px;height:17px;fill:none;stroke:var(--mut);stroke-width:2}
 .rdiv{font-size:11.5px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin:16px 4px 8px}
+.rcor{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#f3f0ff,#eef5ff);border:1px solid #e0defb;border-radius:15px;padding:13px 14px;margin-bottom:9px;box-shadow:0 4px 16px rgba(11,27,59,.07);cursor:pointer}
+.rcor .rm-ic{width:40px;height:40px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;font-size:20px}
+.rcor .rm-b{flex:1;min-width:0}.rcor .rm-b b{font-size:14.5px;font-weight:800;display:block}.rcor .rm-b small{font-size:12px;color:var(--mut);font-weight:600}
+.rcor .rm-n{font-size:12.5px;font-weight:800;color:#6D28D9;flex:none}
+.rsort{display:flex;gap:8px;margin:0 0 10px}
+.rsb{flex:1;padding:9px;border:1px solid #dfe3ef;background:#fff;border-radius:11px;font-size:12.5px;font-weight:700;color:var(--mut);cursor:pointer}
+.rsb.on{background:#0B1B3B;color:#fff;border-color:#0B1B3B}
+.rc-sub2{font-size:12.5px;color:var(--mut);font-weight:700;margin:2px 0 10px}
 .rmuni{display:flex;align-items:center;gap:12px;background:#fff;border-radius:15px;padding:13px 14px;margin-bottom:9px;box-shadow:0 4px 16px rgba(11,27,59,.07);cursor:pointer}
 .rmuni .rm-ic{width:40px;height:40px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;background:#eef0ff;font-size:19px}
 .rmuni .rm-b{flex:1;min-width:0}
@@ -415,8 +423,11 @@ $('btnMuni').onclick=function(){
 /* ====== RUTAS POR MUNICIPIO (foráneas) ====== */
 var rutasOn=false;
 var capaRutaM=L.layerGroup();
-var rutaSel={c:null,orden:[],pts:[],start:null,startLbl:'',centro:null};
+var rutaSel={c:null,orden:[],pts:[],start:null,startLbl:'',centro:null,esCorredor:false,emoji:'',munisList:null,kmMin:0,kmMax:0};
 var rutaModoGps=false;
+var rutaCirc=false;
+var rutaSort='km';
+var CORREDORES_RT=[];
 var RUTA_PER=10;
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function esMorelia(c){return (c||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').indexOf('morelia')>=0;}
@@ -426,29 +437,78 @@ const CANON_BY_NK={"apatzingan":"Apatzingán","lazaro cardenas":"Lázaro Cárden
 function kmMorelia(c,lat,lng){if(typeof KM_MORELIA!=='undefined'&&KM_MORELIA[c]!=null)return KM_MORELIA[c];return Math.round(hav(MORELIA,[lat,lng])/1000*1.3);}
 function nkMuni(s){return (s||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');}
 function canonMuni(c){return (typeof CANON_BY_NK!=='undefined'&&CANON_BY_NK[nkMuni(c)])||c;}
+function medNum(a){a=a.slice().sort(function(x,y){return x-y;});var n=a.length;return n?(n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2):0;}
+function retagOutliers(){
+ function cen(){var m={};PUNTOS.forEach(function(p){if(p.nuevo)return;var k=p.c||'?';if(!m[k])m[k]={la:[],ln:[]};m[k].la.push(p.lat);m[k].ln.push(p.lng);});
+  var c={};Object.keys(m).forEach(function(k){c[k]=[medNum(m[k].la),medNum(m[k].ln)];});return c;}
+ var C=cen(),keys=Object.keys(C);
+ PUNTOS.forEach(function(p){if(p.c&&p.c!=='(sin municipio)')return;var bk=null,bd=Infinity;keys.forEach(function(k){var d=hav(C[k],[p.lat,p.lng]);if(d<bd){bd=d;bk=k;}});if(bk)p.c=bk;});
+ for(var it=0;it<2;it++){var moved=0;
+  PUNTOS.forEach(function(p){if(p.nuevo)return;var cur=C[p.c];if(!cur)return;var dcur=hav(cur,[p.lat,p.lng])/1000;if(dcur<=35)return;
+   var bk=p.c,bd=dcur;keys.forEach(function(k){if(k===p.c)return;var d=hav(C[k],[p.lat,p.lng])/1000;if(d<bd){bd=d;bk=k;}});
+   if(bk!==p.c&&bd<dcur*0.7){p.c=bk;moved++;}});
+  if(!moved)break;C=cen();keys=Object.keys(C);}
+ PUNTOS.forEach(function(p){if(p.nuevo){p.dudoso=false;return;}var cur=C[p.c];p.dudoso=cur?(hav(cur,[p.lat,p.lng])/1000>40):false;});
+}
+function rutaLen(start,ord,cerrar){var d=0,prev=start;for(var i=0;i<ord.length;i++){d+=hav(prev,[ord[i].lat,ord[i].lng]);prev=[ord[i].lat,ord[i].lng];}if(cerrar&&ord.length)d+=hav(prev,start);return d;}
+function dosOpt(start,ord,cerrar){
+ var n=ord.length;if(n<4||n>260)return ord;
+ function co(i){return [ord[i].lat,ord[i].lng];}
+ var improved=true,pass=0;
+ while(improved&&pass<40){improved=false;pass++;
+  for(var i=0;i<n-1;i++){var A=(i===0)?start:co(i-1),B=co(i);
+   for(var k=i+1;k<n;k++){var Cc=co(k),hasD=(k<n-1)||cerrar,D=(k<n-1)?co(k+1):start,delta;
+    if(!hasD){delta=hav(A,Cc)-hav(A,B);}else{delta=hav(A,Cc)+hav(B,D)-hav(A,B)-hav(Cc,D);}
+    if(delta<-1){var lo=i,hi=k;while(lo<hi){var tmp=ord[lo];ord[lo]=ord[hi];ord[hi]=tmp;lo++;hi--;}improved=true;B=co(i);A=(i===0)?start:co(i-1);}
+   }}
+ }
+ return ord;
+}
+function calcCorredores(){
+ var ANC=[{k:'NO',nm:'Ciénega · Noroeste',emoji:'🌾',c:[19.985,-102.283]},
+  {k:'OC',nm:'Lacustre · Occidente',emoji:'🏞️',c:[20.06,-102.72]},
+  {k:'CE',nm:'Meseta Purépecha · Centro',emoji:'🌲',c:[19.41,-102.06]},
+  {k:'TC',nm:'Tierra Caliente · Costa',emoji:'🌵',c:[19.0,-102.35]},
+  {k:'OR',nm:'Oriente',emoji:'⛰️',c:[19.69,-100.56]}];
+ var map={};ANC.forEach(function(a){map[a.k]=[];});
+ MUNIS.forEach(function(o){if(esMorelia(o.c))return;var bk='OR',bd=Infinity;ANC.forEach(function(a){var d=hav(a.c,[o.lat,o.lng]);if(d<bd){bd=d;bk=a.k;}});map[bk].push(o);});
+ CORREDORES_RT=ANC.map(function(a){var arr=map[a.k].slice().sort(function(x,y){return kmMorelia(x.c,x.lat,x.lng)-kmMorelia(y.c,y.lat,y.lng);});
+  var n=arr.reduce(function(s,m){return s+m.n;},0),kms=arr.map(function(m){return kmMorelia(m.c,m.lat,m.lng);});
+  return {k:a.k,nm:a.nm,emoji:a.emoji,munis:arr,lat:a.c[0],lng:a.c[1],n:n,kmMin:kms.length?Math.min.apply(null,kms):0,kmMax:kms.length?Math.max.apply(null,kms):0};
+ }).filter(function(c){return c.munis.length;});
+}
 function nnOrden(start,pts){
  var rest=pts.slice(),out=[],cur=start;
  while(rest.length){var bi=0,bd=Infinity;for(var j=0;j<rest.length;j++){var d=hav(cur,[rest[j].lat,rest[j].lng]);if(d<bd){bd=d;bi=j;}}var nx=rest.splice(bi,1)[0];out.push(nx);cur=[nx.lat,nx.lng];}
  return out;
 }
-function buildTramos(start,orden,per){
+function buildTramos(start,orden,per,cerrar){
  var tramos=[];
  for(var i=0;i<orden.length;i+=per){
   var chunk=orden.slice(i,i+per);
   var origin=i===0?start:[orden[i-1].lat,orden[i-1].lng];
   var pathPts=[origin].concat(chunk.map(function(p){return [p.lat,p.lng];}));
+  if(cerrar&&i+per>=orden.length)pathPts.push(start);
   var url='https://www.google.com/maps/dir/'+pathPts.map(function(a){return a[0]+','+a[1];}).join('/');
   tramos.push({desde:i+1,hasta:i+chunk.length,pts:chunk,url:url});
  }
  return tramos;
 }
 function rutasInit(){
- calcMunis();
+ calcMunis();calcCorredores();
+ rutaSel.esCorredor=false;
+ var cor=CORREDORES_RT.map(function(c){return "<div class='rcor' data-k='"+c.k+"'><div class='rm-ic'>"+c.emoji+"</div><div class='rm-b'><b>"+esc(c.nm)+"</b><small>"+c.munis.length+" municipios · "+c.n+" negocios · "+c.kmMin+"–"+c.kmMax+" km</small></div><div class='rm-n'>Viaje ›</div></div>";}).join('');
  $('rutas').innerHTML=
   "<div class='rtitulo'>🧭 Armar ruta de venta</div>"
-  +"<div class='rsubtit'>Ordenados del más cercano al más lejano: km reales por carretera desde Morelia. Elige un municipio, juntamos todos sus negocios —base + los nuevos de campo—, los ordenamos en la ruta más corta y los abres en Google Maps.</div>"
+  +"<div class='rsubtit'>Elige un <b>corredor</b> para planear un viaje de varios pueblos de un jalón, o un <b>municipio</b> suelto. Juntamos todos los negocios (base + nuevos de campo), los ordenamos en la ruta más corta y los abres en Google Maps.</div>"
+  +"<div class='rdiv'>🗺️ Viajes por corredor</div>"+cor
+  +"<div class='rdiv'>Por municipio</div>"
+  +"<div class='rsort'><button class='rsb"+(rutaSort==='km'?' on':'')+"' id='rSortKm'>📍 Más cercanos</button><button class='rsb"+(rutaSort==='roi'?' on':'')+"' id='rSortRoi'>📈 Mejor rendimiento</button></div>"
   +"<div class='rsearch'><svg viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M21 21l-4-4'/></svg><input id='rqMuni' placeholder='Buscar municipio (Zamora, Uruapan…)'></div>"
   +"<div id='rutasBody'></div>";
+ $('rutas').querySelectorAll('.rcor').forEach(function(it){it.onclick=function(){rutasPickCorredor(it.dataset.k);};});
+ $('rSortKm').onclick=function(){rutaSort='km';$('rSortKm').classList.add('on');$('rSortRoi').classList.remove('on');rutasBody($('rqMuni').value);};
+ $('rSortRoi').onclick=function(){rutaSort='roi';$('rSortRoi').classList.add('on');$('rSortKm').classList.remove('on');rutasBody($('rqMuni').value);};
  $('rqMuni').oninput=function(){rutasBody(this.value);};
  rutasBody('');
 }
@@ -456,9 +516,10 @@ function rutasBody(q){
  q=(q||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
  function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
  var lista=MUNIS.filter(function(o){return !q||norm(o.c).indexOf(q)>=0;});
- var fr=lista.filter(function(o){return !esMorelia(o.c);}).sort(function(a,b){return kmMorelia(a.c,a.lat,a.lng)-kmMorelia(b.c,b.lat,b.lng);});
+ function roiOf(o){var km=kmMorelia(o.c,o.lat,o.lng);return o.n/Math.max(km/100,0.3);}
+ var fr=lista.filter(function(o){return !esMorelia(o.c);}).sort(function(a,b){return rutaSort==='roi'?roiOf(b)-roiOf(a):kmMorelia(a.c,a.lat,a.lng)-kmMorelia(b.c,b.lat,b.lng);});
  var mo=lista.filter(function(o){return esMorelia(o.c);});
- function item(o){return "<div class='rmuni"+(esMorelia(o.c)?' mor':'')+"' data-c=\""+esc(o.c)+"\"><div class='rm-ic'>🏙️</div><div class='rm-b'><b>"+esc(o.c)+"</b><small>"+(esMorelia(o.c)?'📍 Morelia (base)':'🚗 '+kmMorelia(o.c,o.lat,o.lng)+' km de Morelia')+" · "+o.n+" negocio"+(o.n===1?'':'s')+(o.pj?' · '+o.pj+' PayJoy':'')+(o.nv?' · '+o.nv+' nuevos':'')+"</small></div><div class='rm-n'>Armar ›</div></div>";}
+ function item(o){var km=kmMorelia(o.c,o.lat,o.lng);var roi=esMorelia(o.c)?0:Math.round(roiOf(o));return "<div class='rmuni"+(esMorelia(o.c)?' mor':'')+"' data-c=\""+esc(o.c)+"\"><div class='rm-ic'>🏙️</div><div class='rm-b'><b>"+esc(o.c)+"</b><small>"+(esMorelia(o.c)?'📍 Morelia (base)':'🚗 '+km+' km'+(roi?' · 📈 '+roi+'/100km':''))+" · "+o.n+" negocio"+(o.n===1?'':'s')+(o.pj?' · '+o.pj+' PayJoy':'')+(o.nv?' · '+o.nv+' nuevos':'')+"</small></div><div class='rm-n'>Armar ›</div></div>";}
  var h='';
  if(fr.length)h+="<div class='rdiv'>Destinos foráneos ("+fr.length+")</div>"+fr.map(item).join('');
  else h+="<div class='rsubtit' style='text-align:center;margin-top:24px'>Sin municipios con ese nombre.</div>";
@@ -467,28 +528,47 @@ function rutasBody(q){
  b.querySelectorAll('.rmuni').forEach(function(it){it.onclick=function(){rutasPick(it.dataset.c);};});
 }
 function rutasPick(c){
- rutaSel.c=c;
+ rutaSel.c=c;rutaSel.esCorredor=false;rutaCirc=false;
  rutaSel.pts=PUNTOS.filter(function(p){return p.c===c;});
  var mu=MUNIS.filter(function(o){return o.c===c;})[0];
  rutaSel.centro=mu?[mu.lat,mu.lng]:(rutaSel.pts.length?[rutaSel.pts[0].lat,rutaSel.pts[0].lng]:[19.7,-101.19]);
  rutaModoGps=false;
  rutasDetalle();
 }
+function rutasPickCorredor(k){
+ var cor=null;for(var i=0;i<CORREDORES_RT.length;i++){if(CORREDORES_RT[i].k===k)cor=CORREDORES_RT[i];}
+ if(!cor)return;
+ var names={};cor.munis.forEach(function(m){names[m.c]=1;});
+ rutaSel.c=cor.nm;rutaSel.emoji=cor.emoji;rutaSel.esCorredor=true;
+ rutaSel.munisList=cor.munis;rutaSel.kmMin=cor.kmMin;rutaSel.kmMax=cor.kmMax;
+ rutaSel.pts=PUNTOS.filter(function(p){return names[p.c];});
+ rutaSel.centro=[cor.lat,cor.lng];
+ rutaModoGps=false;rutaCirc=false;
+ rutasDetalle();
+}
 function rutaCalcStart(){
- if(rutaModoGps&&userLL){rutaSel.start=userLL;rutaSel.startLbl='tu ubicación 📍';}
- else{rutaSel.start=rutaSel.centro;rutaSel.startLbl='centro del municipio';}
+ if(rutaModoGps&&userLL){rutaSel.start=userLL;rutaSel.startLbl='tu ubicación 📍';return;}
+ var pts=rutaSel.pts;
+ if(pts&&pts.length){var bi=0,bd=Infinity;for(var i=0;i<pts.length;i++){var d=hav(MORELIA,[pts[i].lat,pts[i].lng]);if(d<bd){bd=d;bi=i;}}rutaSel.start=[pts[bi].lat,pts[bi].lng];rutaSel.startLbl='la entrada (viniendo de Morelia)';}
+ else{rutaSel.start=rutaSel.centro;rutaSel.startLbl='el centro del municipio';}
 }
 function rutasDetalle(){
  rutaCalcStart();
- rutaSel.orden=nnOrden(rutaSel.start,rutaSel.pts);
+ rutaSel.orden=dosOpt(rutaSel.start,nnOrden(rutaSel.start,rutaSel.pts),rutaCirc);
  var orden=rutaSel.orden,c=rutaSel.c,total=orden.length;
- var tramos=buildTramos(rutaSel.start,orden,RUTA_PER);
+ var tramos=buildTramos(rutaSel.start,orden,RUTA_PER,rutaCirc);
  var pj=rutaSel.pts.filter(function(p){return p.cr;}).length;
  var nv=rutaSel.pts.filter(function(p){return p.nuevo;}).length;
+ var sintel=rutaSel.pts.filter(function(p){return !(p.tel&&p.tel.trim());}).length;
+ var dud=rutaSel.pts.filter(function(p){return p.dudoso;}).length;
+ var kmInt=Math.round(rutaLen(rutaSel.start,orden,rutaCirc)/1000);
+ var sub=esMorelia(c)?'📍 Morelia':(rutaSel.esCorredor?esc(rutaSel.emoji)+' Corredor · '+(rutaSel.munisList?rutaSel.munisList.length:0)+' municipios · '+rutaSel.kmMin+'–'+rutaSel.kmMax+' km de Morelia':'🚗 '+kmMorelia(c,rutaSel.centro[0],rutaSel.centro[1])+' km de Morelia');
  var h="<div class='rback' id='rBack'>‹ Cambiar destino</div>"
-  +"<div class='rcard'><h3>"+esc(c)+"</h3><div class='rc-sub'>"+(esMorelia(c)?'📍 Morelia':'🚗 '+kmMorelia(c,rutaSel.centro[0],rutaSel.centro[1])+' km de Morelia')+" · "+total+" negocio"+(total===1?'':'s')+(pj?' · '+pj+' PayJoy':'')+(nv?' · '+nv+' nuevos':'')+"</div>"
-  +"<div class='rinicio'><button class='rbtn"+(!rutaModoGps?' on':'')+"' id='rStCen'>🏙️ Desde el municipio</button><button class='rbtn"+(rutaModoGps?' on':'')+"' id='rStGps'>📍 Desde mi ubicación</button></div>"
-  +"<div class='rfila'><label>Paradas por salida</label><select id='rPer'><option value='8'>8</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select><span style='font-size:12px;color:var(--mut);font-weight:600'>inicia en "+esc(rutaSel.startLbl)+"</span></div>"
+  +"<div class='rcard'><h3>"+(rutaSel.esCorredor?esc(rutaSel.emoji)+' ':'')+esc(c)+"</h3><div class='rc-sub'>"+sub+" · "+total+" negocio"+(total===1?'':'s')+(pj?' · '+pj+' PayJoy':'')+(nv?' · '+nv+' nuevos':'')+"</div>"
+  +"<div class='rc-sub2'>🛣️ ~"+kmInt+" km de recorrido"+(sintel?' · 📵 '+sintel+' sin tel':'')+(dud?" · <span style='color:#E5322D'>⚠️ "+dud+" ubicación a revisar</span>":'')+"</div>"
+  +"<div class='rinicio'><button class='rbtn"+(!rutaModoGps?' on':'')+"' id='rStCen'>🚪 Desde la entrada</button><button class='rbtn"+(rutaModoGps?' on':'')+"' id='rStGps'>📍 Desde mi ubicación</button></div>"
+  +"<div class='rfila'><label>Paradas por salida</label><select id='rPer'><option value='8'>8</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select><button class='rbtn"+(rutaCirc?' on':'')+"' id='rCirc' style='flex:none'>🔁 Cerrar circuito</button></div>"
+  +"<div style='font-size:12px;color:var(--mut);font-weight:600;margin-top:4px'>Inicia en "+esc(rutaSel.startLbl)+(rutaCirc?' y regresa ahí':'')+"</div>"
   +"</div>";
  h+="<button class='rgo ghost' id='rVerMapa'>🗺️ Ver la ruta en el mapa</button>";
  if(tramos.length<=1){
@@ -512,6 +592,7 @@ function rutasDetalle(){
   navigator.geolocation.getCurrentPosition(function(pos){userLL=[pos.coords.latitude,pos.coords.longitude];rutaModoGps=true;rutasDetalle();},function(){toast('No pude obtener tu ubicación.');},{enableHighAccuracy:true,timeout:9000});
  };
  var sel=$('rPer');sel.value=String(RUTA_PER);sel.onchange=function(){RUTA_PER=+sel.value;rutasDetalle();};
+ var cb=$('rCirc');if(cb)cb.onclick=function(){rutaCirc=!rutaCirc;rutasDetalle();};
  $('rVerMapa').onclick=rutasDibujarEnMapa;
 }
 function rutasDibujarEnMapa(){
@@ -596,6 +677,7 @@ async function cargarNuevos(){
  PUNTOS=DATA.map(function(p,i){return {id:i,n:p.n,c:p.c,t:p.t,tel:p.tel,r:p.r,cr:p.cr,lat:p.la,lng:p.ln};});
  await cargarNuevos();
  for(var ci=0;ci<PUNTOS.length;ci++){PUNTOS[ci].c=canonMuni(PUNTOS[ci].c);}
+ retagOutliers();
  var cities=[...new Set(PUNTOS.map(function(p){return p.c;}).filter(Boolean))].sort(function(a,b){return a.localeCompare(b,'es');});
  for(const c of cities){var o=document.createElement('option');o.value=c;o.textContent=c;$('fCiudad').appendChild(o);var o2=document.createElement('option');o2.value=c;$('ciudades').appendChild(o2);}
  var tc={};for(const p of PUNTOS){var t=(p.t||'').trim();if(t)tc[t]=(tc[t]||0)+1;}
