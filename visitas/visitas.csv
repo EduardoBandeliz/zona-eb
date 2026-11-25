@@ -1,4 +1,8 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-25,22:56,Antonio Arias,Reparación de celulares,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.7218451,-101.1673124,Ya tiene proveedor
+2026-11-25,22:46,Antonio Arias,Telcel Mercado de abastos,,,0,0,0,0,0,existente,,19.7137813,-101.1655734,Ya tienen proveedor
+2026-11-25,22:34,Antonio Arias,Reparaciones de celulares tijeras,Morelia,Michoacán,0,0,0,0,0,existente,,19.707025,-101.161046,Ya tiene proveedor
+2026-11-25,22:27,Antonio Arias,Telcel,Morelia,Michoacán,20,5,0,0,25,existente,Andrea Manzano,19.707749,-101.1583983,
 2026-11-25,20:26,Antonio Arias,Chips Fray Sebastián,,,0,0,0,0,0,existente,,19.7111773,-101.1497885,"Cerrado, regreso mas tarde"
 2026-11-25,20:13,Antonio Arias,Papelería,,,0,0,0,0,0,existente,,19.7043857,-101.154292,Ya tienen proveedor servitel
 2026-11-25,19:42,Antonio Arias,Reparaciones fercho,,,0,0,0,0,0,existente,Fernando,19.7070031,-101.155205,Regreso al rato
