@@ -1,4 +1,6 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-26,18:56,Antonio Arias,The Phone,,,9,5,5,10,29,nuevo,José Geovanny,19.760341,-101.1421676,
+2026-11-26,18:43,Antonio Arias,Toto papelería,,,0,0,0,0,0,existente,,19.7605834,-101.1406075,No quiere vender
 2026-11-26,18:03,Antonio Arias,Tienda 2 Espigas,Zinapecuaro,Michoacán,0,0,0,0,0,existente,,19.7918275,-101.1450921,No le interesa
 2026-11-26,17:19,Antonio Arias,Tienda 1 Espigas,Zinapecuaro,Michoacán,0,0,0,0,0,nuevo,,19.7941063,-101.1416714,No le interesa vender
 2026-11-26,17:13,Antonio Arias,Rodricell Reparación de celulares,Zinapecuaro,Michoacán,0,0,0,0,0,existente,,19.794006,-101.142426,Está horrible
