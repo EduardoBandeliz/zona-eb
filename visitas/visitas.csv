@@ -1,4 +1,8 @@
 ﻿Fecha,Hora,Vendedor,Cliente,Municipio,Estado,Telcel,AT&T,Unefon,Bait,Chips,Tipo,Contacto,Lat,Lng,Nota
+2026-11-26,23:12,Antonio Arias,Accesorios,Morelia,Michoacán,0,0,0,0,0,nuevo,,19.7204901,-101.1707183,Proveedor yaavs
+2026-11-26,22:54,Antonio Arias,Telcel,Morelia,Michoacán,0,0,0,0,0,existente,,19.721338,-101.169597,
+2026-11-26,22:39,Antonio Arias,Reparaciones fercho,,,20,0,0,0,20,existente,Fernando,19.7070031,-101.155205,
+2026-11-26,22:28,Antonio Arias,Chips Fray Sebastián,,,20,0,0,0,20,existente,Mario,19.7111773,-101.1497885,
 2026-11-26,19:46,Antonio Arias,Reparación celular,,,20,5,5,10,40,nuevo,Julio César Ramos Cruz,19.7430078,-101.1348476,
 2026-11-26,19:23,Antonio Arias,Tienda 3,,,0,0,0,0,0,existente,,19.7512601,-101.1423429,No le interesa
 2026-11-26,18:56,Antonio Arias,The Phone,,,9,5,5,10,29,nuevo,José Geovanny,19.760341,-101.1421676,
